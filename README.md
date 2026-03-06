@@ -25,6 +25,7 @@ ln -s /path/to/claude-skills/skills/* ~/.claude/skills/
 | review-performance | パフォーマンス（N+1、不要な計算、メモリ）のレビュー |
 | review-security | セキュリティ（インジェクション、認証認可）のレビュー |
 | review-testing | テスト設計・テストの質のレビュー |
+| review-architecture | アーキテクチャ設計（レイヤー分離、依存方向、CQRS）のレビュー |
 | review-report | 各レビュー観点の結果を統合したレポート生成 |
 
 ## 参考
