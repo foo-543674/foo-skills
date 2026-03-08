@@ -27,6 +27,14 @@ ln -s /path/to/claude-skills/skills/* ~/.claude/skills/
 | design-api | API 設計（エンドポイント、リクエスト・レスポンス、エラー、バージョニング） |
 | design-component | コンポーネント設計（責務分割、インターフェース、依存関係） |
 
+### 環境構築
+
+| スキル | 説明 |
+|-------|------|
+| setup-devcontainer | コンテナベースの開発環境構築（devcontainer） |
+| setup-ci | CI/CD パイプライン構築（GitHub Actions ベース、既存ツール優先） |
+| setup-local-infra | ローカル開発用インフラのコンテナ構築（DB、キャッシュ等） |
+
 ### 実装
 
 | スキル | 説明 |
