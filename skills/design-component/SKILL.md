@@ -75,9 +75,9 @@ UI コンポーネントの状態管理方針を設計する。
 **Page / Container / Presentational の役割分担**:
 
 - **Page**: ルーティングとインフラの境界。パスパラメータ・クエリパラメータのパース、Cookie・localStorage 等のインフラアクセスを抽象化（関数化）し、Container に引き渡す
-- **Container**: ロジックと描画の結合。Hooks を呼び出し、結果を Presentational に渡す。ロジックや API 呼び出し自体は Hooks に委譲する。return で返すのは原則として単一の Presentational コンポーネント
+- **Container**: ロジックと描画の結合。ロジック層を呼び出し、結果を Presentational に渡す。ロジックや API 呼び出し自体はロジック層に委譲する。return で返すのは原則として単一の Presentational コンポーネント
 - **Presentational**: Props を受け取り表示するだけ（純粋関数的）。State や Context を保有しない。ユーザー操作はコールバック Props で親へ通知する
-- **Hooks**: ロジックの整理と再利用。Page からインフラの知識が注入されるため、Hooks 自体はインフラに直接依存しない
+- **ロジック層**: ロジックの整理と再利用。Page からインフラの知識が注入されるため、ロジック層自体はインフラに直接依存しない。フレームワークごとに実現手段が異なる（React: Hooks、SolidJS: Signal/createResource、Vue: Composables 等）
 
 **状態の配置**:
 - 状態はそれを使うコンポーネントにできるだけ近く配置する
