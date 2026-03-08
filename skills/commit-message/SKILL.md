@@ -81,6 +81,7 @@ description: Analyze git diff, stage changes in optimal granularity, and generat
 
 ## メッセージの書き方
 
+- **必ず英語で書く。日本語禁止**
 - **何をしたかではなく、なぜその変更が必要なのかにフォーカスする**
 - 1 行に収まる長さにする
 - 絵文字は使わない
