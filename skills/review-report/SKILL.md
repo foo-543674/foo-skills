@@ -14,8 +14,8 @@ description: 各レビュー観点の結果を統合し、1つのレビューレ
 
 ## Summary
 
-- Critical: N件
-- Warning: N件
+- Critical: N件（技術品質: N件 / 製品品質: N件）
+- Warning: N件（技術品質: N件 / 製品品質: N件）
 - Nit: N件
 
 ## Critical
@@ -49,6 +49,29 @@ description: 各レビュー観点の結果を統合し、1つのレビューレ
 
 レビュー対象のコードで良かった点。
 ```
+
+## 品質カテゴリ
+
+レビュー観点は「技術品質」と「製品品質」の 2 つのカテゴリに分類される。
+
+### 技術品質
+
+その製品において「当然担保されている」と消費者が暗黙的に期待するもの。セールスポイントにはならないが、欠けたときの影響が広範囲に波及する（例: セキュリティ不祥事は企業の信頼そのものを毀損する）。ソフトウェアではテスト、セキュリティ、オブザーバビリティ、エラーハンドリング等がこれにあたる。
+
+### 製品品質
+
+その製品が生み出す価値。セールスポイントとなるもの。低くてもその製品が売れないだけで、影響は技術品質に比べると限定的。
+
+### 優先順位
+
+**技術品質は製品品質に優先する。** 技術品質に Critical が残っている状態で、製品品質の指摘を優先して対応してはならない。レポートの Summary でもこの優先順位を明示する。
+
+### 観点の分類
+
+| カテゴリ | 観点 |
+|---------|------|
+| 技術品質 | Security, Testing, Error Handling, Performance, Concurrency, Type Design, Data Modeling, Dependency, Architecture |
+| 製品品質 | Naming, Comments, Variables, Readability, SOLID, Functional, Component, API Design, State Design |
 
 ## ルール
 
