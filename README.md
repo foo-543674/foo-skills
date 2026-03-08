@@ -11,9 +11,40 @@ ln -s /path/to/claude-skills/skills/* ~/.claude/skills/
 
 ## スキル一覧
 
+### 要件定義
+
 | スキル | 説明 |
 |-------|------|
-| commit-message | コミットメッセージの生成・コミット粒度の判断 |
+| requirements-elicitation | 曖昧な要求から具体的な要件を引き出し整理する |
+| requirements-specification | 要件を受け入れ基準・境界条件・非機能要件として仕様化する |
+
+### 設計
+
+| スキル | 説明 |
+|-------|------|
+| design-architecture | アーキテクチャ設計（レイヤー構成、技術選定、境界定義、CQRS 適用判断） |
+| design-data-model | データモデル設計（エンティティ識別、リレーション、正規化、マイグレーション） |
+| design-api | API 設計（エンドポイント、リクエスト・レスポンス、エラー、バージョニング） |
+| design-component | コンポーネント設計（責務分割、インターフェース、依存関係） |
+
+### 実装
+
+| スキル | 説明 |
+|-------|------|
+| implement-feature | テストファーストで機能を実装する（Red-Green-Refactor） |
+| implement-testing | テスト戦略の策定とテストの実装 |
+| implement-refactor | 既存コードの安全なリファクタリング |
+
+### 開発レポート
+
+| スキル | 説明 |
+|-------|------|
+| development-report | 各フェーズの成果物を統合した開発レポート生成 |
+
+### コードレビュー
+
+| スキル | 説明 |
+|-------|------|
 | review-naming | 命名規則・一貫性のレビュー |
 | review-comments | コメントの書き方（Why vs What、過不足）のレビュー |
 | review-variables | 変数・定数の取り扱い（マジックナンバー、スコープ）のレビュー |
@@ -33,6 +64,12 @@ ln -s /path/to/claude-skills/skills/* ~/.claude/skills/
 | review-dependency | 依存関係設計（ライブラリ選定、循環依存、抽象化、バージョン管理）のレビュー |
 | review-concurrency | 並行処理設計（レースコンディション、トランザクション境界、リトライ戦略）のレビュー |
 | review-report | 各レビュー観点の結果を統合したレポート生成 |
+
+### その他
+
+| スキル | 説明 |
+|-------|------|
+| commit-message | コミットメッセージの生成・コミット粒度の判断 |
 
 ## 参考
 
