@@ -56,7 +56,11 @@ description: Analyze git diff, stage changes in optimal granularity, and generat
    - そのファイルはシステムの挙動を決めるものか（コード、設定ファイル、CI 定義、スキル定義等）→ `docs` ではない
    - 仕様・振る舞いが変わるか → `update`
    - 仕様は変えず品質改善か → `improve` or `refactor`
-3. **新規ファイルの追加の場合**: `feat`
+3. **新規ファイルの追加の場合**: そのファイルの役割を確認する
+   - ユーザー向け機能を提供するものか → `feat`
+   - ビルド、デプロイ、CI、開発補助のためのものか → `chore`
+   - テストか → `test`
+   - ドキュメントか → `docs`
 4. **新規追加と既存変更が混在する場合**: コミットを分ける（後述の粒度ルール参照）
 
 **よくある誤判定**:
@@ -64,6 +68,8 @@ description: Analyze git diff, stage changes in optimal granularity, and generat
 - ✅ 既存のスキル定義や設定ファイルに観点を追加 → `update`（既存の仕様を変更しているから）
 - ❌ マークダウンファイルの変更 → `docs`（拡張子が .md だから）
 - ✅ マークダウンファイルの変更 → ファイルの役割で判断する（挙動を定義するファイルなら `update` 等）
+- ❌ 新規のデプロイスクリプトやビルド設定 → `feat`（新しいファイルだから）
+- ✅ 新規のデプロイスクリプトやビルド設定 → `chore`（開発補助だから）
 
 ### update と improve の境界
 
