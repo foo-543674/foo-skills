@@ -1,11 +1,11 @@
 {
-  "name": "foo-543674-skills",
+  "name": "foo-skills",
   "owner": {
     "name": "foo-543674"
   },
   "plugins": [
     {
-      "name": "claude-skills",
+      "name": "foo-skills",
       "source": "./",
       "description": "Software engineering skills for design, implementation, code review, and development workflow"
     }

@@ -1,4 +1,4 @@
-# claude-skills リポジトリ
+# foo-skills リポジトリ
 
 foo-543674 の設計思想・コードレビュー観点・実装方針を Claude Skills として定義・管理するリポジトリ。
 
@@ -18,7 +18,7 @@ foo-543674 の設計思想・コードレビュー観点・実装方針を Claud
 ## リポジトリ構成
 
 ```
-claude-skills/
+foo-skills/
 ├── .claude-plugin/
 │   └── plugin.json               # プラグインマニフェスト
 ├── .claude/
@@ -344,7 +344,7 @@ AI実行のために以下の構造化を提案します：
 引き出した暗黙知を実装する最適な手段を提案する。
 
 【選択肢】
-A. Skills（claude-skills/skills/）
+A. Skills（foo-skills/skills/）
 B. Hooks（設定ファイルで自動起動）
 C. CLAUDE.md（プロジェクト全体のルール）
 D. Memory（auto memory）

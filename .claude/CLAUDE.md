@@ -1,4 +1,4 @@
-# claude-skills Repository
+# foo-skills Repository
 
 Repository for defining and managing foo-543674's design philosophy, code review perspectives, and implementation policies as Claude Skills.
 
@@ -18,7 +18,7 @@ Skills are not mere "procedure manuals" but **systematizations of the creator's 
 ## Repository Structure
 
 ```
-claude-skills/
+foo-skills/
 ├── .claude-plugin/
 │   └── plugin.json               # Plugin manifest
 ├── .claude/
@@ -328,7 +328,7 @@ Analysis Perspective:
 Propose optimal means to implement elicited tacit knowledge.
 
 Options:
-A. Skills (claude-skills/skills/)
+A. Skills (foo-skills/skills/)
 B. Hooks (auto-start via config file)
 C. CLAUDE.md (project-wide rules)
 D. Memory (auto memory)

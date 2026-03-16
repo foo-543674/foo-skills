@@ -1,10 +1,10 @@
 {
-  "name": "claude-skills",
+  "name": "foo-skills",
   "description": "Software engineering skills for design, implementation, code review, and development workflow by foo-543674",
   "version": "1.0.0",
   "author": {
     "name": "foo-543674"
   },
-  "repository": "https://github.com/foo-543674/claude-skills",
+  "repository": "https://github.com/foo-543674/foo-skills",
   "license": "MIT"
 }

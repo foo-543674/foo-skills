@@ -1,4 +1,4 @@
-# claude-skills
+# foo-skills
 
 自分の設計思想・コードレビュー観点・実装方針を [Claude Code プラグイン](https://docs.anthropic.com/en/docs/claude-code/plugins) として管理するリポジトリ。
 
@@ -6,16 +6,16 @@
 
 ```bash
 # 1. marketplace として登録
-/plugin marketplace add foo-543674/claude-skills
+/plugin marketplace add foo-543674/foo-skills
 
 # 2. プラグインをインストール
-/plugin install claude-skills@foo-543674-skills
+/plugin install foo-skills@foo-543674-skills
 ```
 
 アンインストール:
 
 ```bash
-/plugin uninstall claude-skills
+/plugin uninstall foo-skills
 ```
 
 ## スキル一覧

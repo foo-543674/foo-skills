@@ -1,4 +1,4 @@
-# claude-skills プラグイン
+# foo-skills プラグイン
 
 ソフトウェア開発の各フェーズ（要件定義・設計・実装・レビュー・環境構築）を支援するスキルとエージェント。
 
@@ -48,6 +48,6 @@ setup-*                                    development-report
 
 ## 使い方
 
-- 各スキルは `/claude-skills:<skill-name>` で明示的に呼び出せる
+- 各スキルは `/foo-skills:<skill-name>` で明示的に呼び出せる
 - ユーザーの作業内容に応じて自動的に関連するスキルやエージェントが選択されることもある
 - 設計スキルと code-reviewer の観点は対になっている（例: `design-architecture` ↔ architecture 観点）。設計時にレビュー観点を先取りし、レビューで指摘される問題を事前に回避する
