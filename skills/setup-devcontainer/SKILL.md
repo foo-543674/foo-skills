@@ -123,12 +123,20 @@ features は devcontainer の公式拡張メカニズムであり、言語ラン
    - **必ずユーザーに提案し、許可を得てから採用する**
    - 提案時には feature の GitHub リポジトリ URL・スター数・最終更新日を提示する
 
+**必須 feature: docker-outside-of-docker**:
+
+すべての devcontainer に `ghcr.io/devcontainers/features/docker-outside-of-docker:1` を必ず含める。これにより、コンテナ内からホストの Docker デーモンを共有して `docker` / `docker compose` コマンドを使用できる。docker-in-docker（DinD）ではなく docker-outside-of-docker（DooD）を採用する理由:
+- ホストの Docker デーモンを共有するため、イメージキャッシュが効きビルドが高速
+- ネストされた Docker デーモンの管理が不要で、リソース消費が少ない
+- ホスト側で起動済みのコンテナ（DB 等）との通信が容易
+
 **features で対応できない場合のみ Dockerfile を作成する**:
 
 ```jsonc
 // 良い例: features で宣言的に追加
 {
   "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
     "ghcr.io/devcontainers/features/node:1": { "version": "20" },
     "ghcr.io/devcontainers/features/python:1": { "version": "3.12" }
   }
