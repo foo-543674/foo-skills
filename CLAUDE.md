@@ -19,6 +19,8 @@ Skills are not mere "procedure manuals" but **systematizations of the creator's 
 
 ```
 claude-skills/
+├── .claude-plugin/
+│   └── plugin.json # プラグインマニフェスト
 ├── README.md       # For humans (setup procedures, etc.)
 ├── CLAUDE.md       # This file
 └── skills/         # Skill implementations
@@ -27,7 +29,7 @@ claude-skills/
         └── resources/      # Detailed references, checklists, etc.
 ```
 
-## Skill Creation and Editing Rules
+このリポジトリは Claude Code プラグインとして `claude plugin install github:foo-543674/claude-skills` でインストール可能。インストール後、各スキルは `/claude-skills:<skill-name>` で呼び出せる。
 
 ### SKILL.md Format
 

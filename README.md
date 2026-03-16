@@ -5,11 +5,14 @@
 ## セットアップ
 
 ```bash
-# スキルを ~/.claude/skills/ にコピー
-./deploy.sh
+claude plugin install github:foo-543674/claude-skills
 ```
 
-スキルを更新した場合は再度 `deploy.sh` を実行してください。
+アンインストール:
+
+```bash
+claude plugin uninstall claude-skills
+```
 
 ## スキル一覧
 
