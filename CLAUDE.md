@@ -10,7 +10,7 @@
 requirements-*   design-*   implement-*   code-reviewer (agent)
                                            ↑
 環境構築（実装より先に整備する）           commit-message
-setup-*                                    development-report
+setup-plan → setup-*                       development-report
 ```
 
 ### スキル一覧
@@ -26,6 +26,7 @@ setup-*                                    development-report
 - `design-component`: モジュール・コンポーネントの責務分割とインターフェース設計
 
 **環境構築**: 製品コードの実装より先に整備する技術基盤
+- `setup-plan`: インタビューで構築すべきものを洗い出し、計画書を `.contexts/` に出力する（最初に使う）
 - `setup-devcontainer`: コンテナベースの開発環境
 - `setup-ci`: CI/CD パイプライン（GitHub Actions）
 - `setup-local-infra`: ローカル開発用インフラ（DB、キャッシュ等を docker compose で構築）
