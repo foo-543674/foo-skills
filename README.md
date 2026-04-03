@@ -40,6 +40,7 @@
 
 | スキル | 説明 |
 |-------|------|
+| setup-plan | インタビューで構築すべきものを洗い出し、環境構築の計画書を出力する |
 | setup-devcontainer | コンテナベースの開発環境構築（devcontainer） |
 | setup-ci | CI/CD パイプライン構築（GitHub Actions ベース、既存ツール優先） |
 | setup-local-infra | ローカル開発用インフラのコンテナ構築（DB、キャッシュ等） |
