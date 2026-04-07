@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   version-up:
@@ -58,19 +59,24 @@ jobs:
             .claude-plugin/plugin.json > tmp.json
           mv tmp.json .claude-plugin/plugin.json
 
-      - name: Commit and tag
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .claude-plugin/plugin.json
-          git commit -m "[chore] bump plugin version to ${{ steps.next.outputs.version }}"
-          git tag "v${{ steps.next.outputs.version }}"
-          git push origin HEAD --tags
-
-      - name: Create GitHub Release
+      - name: Create pull request
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "v${{ steps.next.outputs.version }}" \
-            --title "v${{ steps.next.outputs.version }}" \
-            --generate-notes
+          next_version="${{ steps.next.outputs.version }}"
+          branch="chore/version-up-${next_version}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add .claude-plugin/plugin.json
+          git commit -m "[chore] bump plugin version to ${next_version}"
+          git push origin "$branch"
+
+          gh pr create \
+            --base main \
+            --head "$branch" \
+            --title "[chore] bump plugin version to ${next_version}" \
+            --body "Bump plugin version from ${{ steps.current.outputs.version }} to ${next_version}.
+
+          Merging this PR will trigger the release workflow to create the \`v${next_version}\` tag and GitHub Release."
