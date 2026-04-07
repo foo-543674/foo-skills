@@ -133,6 +133,24 @@
 3. 見つかれば `<plugin-name>@<marketplace-name>` 形式で計画書に記載
 4. 見つからなければプレースホルダ + 注記（「既知マーケットプレイスに存在しないため別途検索が必要」）
 
+**.gitignore**:
+- 技術スタックから導出する（言語固有・ビルド成果物・依存ディレクトリ）
+- エディタ・OS 由来のノイズ（`.DS_Store`, `Thumbs.db`, `.idea/` 等）
+- ローカル環境ファイル（`.env`, `.env.local`, `*.local.*`）
+- テスト・カバレッジ成果物（`coverage/`, `.nyc_output/`, `*.lcov`）
+- devcontainer / docker のローカル状態（必要に応じて）
+- `.contexts/` のうちユーザー固有の作業ファイル（計画書本体は含める）
+
+**.gitignore の導出例**:
+
+| 技術スタック | 主な ignore パターン |
+|---|---|
+| Node.js / TypeScript | `node_modules/`, `dist/`, `build/`, `.next/`, `*.tsbuildinfo` |
+| Rust | `target/`, `Cargo.lock`（ライブラリの場合）, `**/*.rs.bk` |
+| Go | `vendor/`, `*.test`, `*.out`, バイナリ |
+| Python | `__pycache__/`, `*.pyc`, `.venv/`, `.pytest_cache/`, `.mypy_cache/` |
+| Java / Kotlin | `target/`, `build/`, `.gradle/`, `*.class` |
+
 **CI**:
 - テスト実行速度の計測（CI の実行時間をトラッキング）
 - テストレポートのブラウザ公開

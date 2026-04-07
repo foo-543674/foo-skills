@@ -198,6 +198,10 @@ CI ツール、自動化したいこと、重視することを聞く。
 ### CLAUDE.md
 [プロジェクト固有のコンテキスト。アーキテクチャ概要、開発フロー、主要コマンド]
 
+## .gitignore
+
+[技術スタックから導出される ignore パターン。言語固有（node_modules, target, __pycache__, vendor 等）、エディタ・OS（.DS_Store, .idea, .vscode の例外）、ビルド成果物、ローカル環境ファイル（.env.local 等）、テスト成果物（coverage, .nyc_output 等）を網羅する]
+
 ## 構築タスク
 
 以下の順序で構築する。各タスクは対応する setup-* スキルに委譲する。
@@ -206,9 +210,10 @@ CI ツール、自動化したいこと、重視することを聞く。
 1. [ ] devcontainer の構築 → `setup-devcontainer` スキル
 2. [ ] ローカルインフラの構築 → `setup-local-infra` スキル
 3. [ ] CI パイプラインの構築 → `setup-ci` スキル
-4. [ ] Claude 設定の構築（.claude/settings.json の permissions と enabledPlugins、CLAUDE.md）
-5. [ ] ドキュメントの初期構成
-6. [ ] 動作確認（devcontainer 起動 → インフラ起動 → テスト実行 → CI 実行）
+4. [ ] .gitignore の作成
+5. [ ] Claude 設定の構築（.claude/settings.json の permissions と enabledPlugins、CLAUDE.md）
+6. [ ] ドキュメントの初期構成
+7. [ ] 動作確認（devcontainer 起動 → インフラ起動 → テスト実行 → CI 実行）
 ```
 
 ## 計画書出力後のフロー
