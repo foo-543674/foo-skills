@@ -44,12 +44,12 @@ foo-543674 は「推論能力の問題だとも思うけど、どういうコン
 
 **場面**: Phase 2 Why の深掘りで、AI が「A/B/C レイヤー（スキル自体への指摘 / 成果物への指摘 / 両方）」という分類を 2 ターン連続で提示していたところ、foo-543674 がリポジトリの本来の目的（複製プロジェクト）を説明し、AI の問いの立て方そのものが的外れだったことを指摘した。
 
-**AI の失敗（表面）**: リポジトリの CLAUDE.md には「foo-skills Repository is for defining and managing foo-543674's design philosophy... Skills are systematizations of the creator's thought processes and judgment criteria」と書かれているにもかかわらず、これを踏まえずに一般論ベースで問いを組み立てていた。
+**AI の失敗（表面）**: リポジトリの `.claude/CLAUDE.md` には「foo-skills Repository is for defining and managing foo-543674's design philosophy... Skills are systematizations of the creator's thought processes and judgment criteria」と書かれているにもかかわらず、これを踏まえずに一般論ベースで問いを組み立てていた。
 
 **判定: confirmed（カテゴリ: 目的・前提の読み落とし）**
 
 **理由**:
-リポジトリの目的（複製）は CLAUDE.md に明記されており、AI がこれを読めていれば「フィードバックループの目的 = 複製精度を上げること」という解釈にたどり着けたはず。requirements-elicitation / 暗黙知引き出しプロトコルを実行する際に **「まず対象リポジトリの目的を CLAUDE.md から確認する」** というステップを明示しておけば防げる。スキル定義の改善で再発防止可能。
+少なくとも `.claude/CLAUDE.md` の記述から、このリポジトリが foo-543674 の設計思想・思考過程・判断基準を体系化する場であることは読み取れる。AI がこれを起点に解釈していれば、「フィードバックループの目的 = 複製精度を上げること」という文脈にたどり着けたはず。requirements-elicitation / 暗黙知引き出しプロトコルを実行する際に **「まず対象リポジトリの目的・方針を `.claude/CLAUDE.md` などの方針文書から確認する」** というステップを明示しておけば防げる。スキル定義の改善で再発防止可能。
 
 **教訓**: 「対話型スキルを起動した瞬間に、リポジトリの目的・方針を読み込む」というフローが欠けていた場合、この種の失敗が起きやすい。同種の指摘を見たら confirmed。
 
