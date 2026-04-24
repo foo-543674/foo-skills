@@ -1,6 +1,14 @@
 # foo-skills
 
-自分の設計思想・コードレビュー観点・実装方針を [Claude Code プラグイン](https://docs.anthropic.com/en/docs/claude-code/plugins) として管理するリポジトリ。
+プロジェクトに AI が自走するためのコンテキスト基盤を生成する [Claude Code プラグイン](https://docs.anthropic.com/en/docs/claude-code/plugins)。
+
+## これは何か
+
+このプラグインは「直接使う AI ツール」ではなく、**プロジェクトに AI 自走基盤を生成するジェネレータ**。
+
+- `philosophy/` と `perspectives/` に私の価値観と品質基準が定義されている (原料)
+- `bootstrap` スキルがそれらをプロジェクト固有のコンテキストに変換する (エンジン)
+- 生成されたプロジェクトはプラグインなしでも動く (Claude Code / Copilot / Cursor 対応)
 
 ## セットアップ
 
@@ -18,62 +26,59 @@
 /plugin uninstall foo-skills
 ```
 
-## スキル一覧
+## 使い方
 
-### 要件定義
+```
+/foo-skills:bootstrap
+```
 
-| スキル | 説明 |
-|-------|------|
-| requirements-elicitation | 曖昧な要求から具体的な要件を引き出し整理する |
-| requirements-specification | 要件を受け入れ基準・境界条件・非機能要件として仕様化する |
+新規プロジェクトまたは既存プロジェクトで実行すると、対話を通じて以下を生成する:
 
-### 設計
+| 生成物 | 説明 |
+|--------|------|
+| `CLAUDE.md` | プロジェクト固有のコンテキスト (原則、品質基準、判断委任範囲、コミット規約) |
+| `.github/copilot-instructions.md` | Copilot 用コンテキスト |
+| `.cursorrules` | Cursor 用コンテキスト |
+| `.claude/agents/code-reviewer.md` | プロジェクト固有のレビューエージェント |
+| `tests/arch/` | アーキテクチャテスト (依存方向、型漏出等を CI で自動検証) |
+| devcontainer, CI, etc. | 技術インフラ (AI が自走で構築) |
 
-| スキル | 説明 |
-|-------|------|
-| design-architecture | アーキテクチャ設計（レイヤー構成、技術選定、境界定義、CQRS 適用判断） |
-| design-data-model | データモデル設計（エンティティ識別、リレーション、正規化、マイグレーション） |
-| design-api | API 設計（エンドポイント、リクエスト・レスポンス、エラー、バージョニング） |
-| design-component | コンポーネント設計（責務分割、インターフェース、依存関係） |
+## 構成
 
-### 環境構築
-
-| スキル | 説明 |
-|-------|------|
-| setup-plan | インタビューで構築すべきものを洗い出し、環境構築の計画書を出力する |
-| setup-devcontainer | コンテナベースの開発環境構築（devcontainer） |
-| setup-ci | CI/CD パイプライン構築（GitHub Actions ベース、既存ツール優先） |
-| setup-local-infra | ローカル開発用インフラのコンテナ構築（DB、キャッシュ等） |
-
-### 実装
-
-| スキル | 説明 |
-|-------|------|
-| plan-implementation | 設計済みタスクを俯瞰し、AC/DoD を確定し、バーチカルスライスに分割した実装計画書を出力する |
-| implement-feature | テストファーストで機能を実装する（Red-Green-Refactor） |
-| implement-testing | テスト戦略の策定とテストの実装 |
-| implement-refactor | 既存コードの安全なリファクタリング |
-
-### その他
-
-| スキル | 説明 |
-|-------|------|
-| commit-message | コミットメッセージの生成・コミット粒度の判断 |
-| development-report | 各フェーズの成果物を統合した開発レポート生成 |
-| skill-feedback | 対話型スキル利用後に foo-543674 から受けた指摘を GitHub Issue として foo-skills に登録する（foo-543674 本人のみ動作） |
-
-## エージェント
-
-| エージェント | 説明 |
-|-------------|------|
-| code-reviewer | 変更コードに対して 17 観点から関連するものを自動選択し、統合レビューレポートを生成する |
-
-### code-reviewer のレビュー観点（17 観点）
-
-**技術品質**（優先）: Architecture, Security, Testing, Error Handling, Performance, Concurrency, Type Design, Data Modeling, Dependency
-
-**製品品質**: Naming, Comments, Variables, Readability, SOLID, Functional, Component, API Design, State Design
+```
+foo-skills/
+├── philosophy/          私の価値観・判断基準 (4 files)
+│   ├── core-principles    語彙定義義務、逃げの禁止、捨てやすさ
+│   ├── technology-choices 静的型付け優先、関数型寄り
+│   ├── quality-standards  製品品質 vs 技術品質、三層防御
+│   └── development-values バーチカルスライス、テストファースト
+│
+├── perspectives/        品質レンズ (20 files)
+│   ├── architecture       営みの起源、レイヤー定義、依存方向
+│   ├── api-design         契約の明確性、ステータスセマンティクス
+│   ├── data-modeling      ストレージ非依存、正規化判断
+│   ├── component          4 Tier 分割、シグネチャ境界
+│   ├── disposability      影響範囲のコントロール可能性
+│   ├── testing            テスト価値マトリクス、境界値
+│   ├── error-handling     Result/Either vs 例外
+│   ├── security           入力は信頼しない、最小権限
+│   ├── performance        N+1、計算量、計測してから最適化
+│   ├── concurrency        共有データ保護、デッドロック防止
+│   ├── naming             名前と動作の一致、概念語の統一
+│   ├── readability        認知負荷の最小化、ネスト深度
+│   ├── comments           Why を書く、prefix 規約
+│   ├── variables          Immutable by default
+│   ├── solid              SRP、DIP
+│   ├── functional         Pure functions、高階関数
+│   ├── type-design        Discriminated Union、Branded Type
+│   ├── state-design       Boolean Explosion 防止
+│   ├── dependency         依存追加の意識的判断
+│   └── documentation      設計判断の記録
+│
+└── skills/bootstrap/    AI 自走基盤の生成器
+```
 
 ## 参考
 
 - [Claude Code Plugins ドキュメント](https://docs.anthropic.com/en/docs/claude-code/plugins)
+- [PROPOSAL-v2.md](PROPOSAL-v2.md) — v2 設計企画書
