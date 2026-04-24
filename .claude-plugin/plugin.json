@@ -1,6 +1,6 @@
 {
   "name": "foo-skills",
-  "description": "Software engineering skills for design, implementation, code review, and development workflow by foo-543674",
+  "description": "AI self-running context generator. Bootstraps projects with CLAUDE.md, architecture tests, code-reviewer agents, and tool-agnostic AI context based on foo-543674's engineering philosophy.",
   "version": "1.2.1",
   "author": {
     "name": "foo-543674"
