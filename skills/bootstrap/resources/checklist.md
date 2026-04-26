@@ -17,11 +17,14 @@
 
 ## Phase 3: Generate AI Context
 
-- [ ] CLAUDE.md が生成された
-- [ ] .github/copilot-instructions.md が生成された (GitHub 利用の場合)
-- [ ] .cursorrules が生成された (Cursor 利用者がいる場合)
-- [ ] コミット規約が CLAUDE.md に含まれている
-- [ ] AI の判断委任範囲が明示されている
+- [ ] **AGENTS.md (原典) が生成された** — プロジェクト指示の単一原典として全 AI ツール向け内容を収録
+- [ ] CLAUDE.md が生成された (`@AGENTS.md` で AGENTS.md を import している)
+- [ ] GEMINI.md が生成された (`@AGENTS.md` で AGENTS.md を import している、Gemini CLI 利用者がいる場合)
+- [ ] .github/copilot-instructions.md が生成された (GitHub Copilot 利用の場合、AGENTS.md から派生生成)
+- [ ] .cursorrules が生成された (Cursor 利用者がいる場合、AGENTS.md から派生生成)
+- [ ] 派生生成系ファイルの冒頭に「派生元: AGENTS.md / 再 bootstrap で再同期」を明記している
+- [ ] コミット規約が AGENTS.md に含まれている
+- [ ] AI の判断委任範囲が AGENTS.md に明示されている
 - [ ] .contexts/bootstrap-decisions.md に判断記録が残されている
 
 ## Phase 4: Generate Architecture Tests
@@ -38,6 +41,6 @@
 - [ ] **止まる**: 規約違反・型エラー・テスト失敗が検知されて止まる
 - [ ] **再現する**: devcontainer 等で別環境でも同じ結果になる
 - [ ] **見える**: ログ・エラー・テストレポートが読める
-- [ ] CLAUDE.md の「開発コマンド」が実際のコマンドで埋まっている
+- [ ] AGENTS.md の「開発コマンド」が実際のコマンドで埋まっている (CLAUDE.md / GEMINI.md は `@AGENTS.md` で連動)
 - [ ] .claude/settings.json の許可コマンドが設定されている
 - [ ] known-pitfalls.md の該当エントリを確認し、該当する場合は回避策を適用した
