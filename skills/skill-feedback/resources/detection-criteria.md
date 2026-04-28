@@ -100,7 +100,7 @@
 2. **カテゴリ内の具体ファイルを推定**:
    - philosophy: core-principles / technology-choices / quality-standards / development-values
    - perspectives: 20 観点のいずれか（architecture, testing, naming 等）
-   - skills: 起動条件・振る舞い・判定規則のどれが不足しているか
+   - skills: 該当スキルの `SKILL.md` または `resources/` 配下のファイル（およびその中の不足セクション。例: 起動条件 / 振る舞い / 判定規則）
 3. **`source:` ラベル付与の判断**:
    - 推定したカテゴリに対応する `source:<name>` ラベルが既に整備されていれば付与する
    - 整備されていない場合（例: plugin 内蔵スキル）は **新規ラベルを AI 側で作成せず、`source:` ラベルを省略**。本文「対象」セクションで対象原料パスを明記する

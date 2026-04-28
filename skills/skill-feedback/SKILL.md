@@ -158,7 +158,7 @@ Issue は作成しません。
 - `source:bootstrap/template` — 生成テンプレートの不足
 - `source:bootstrap/skill` — bootstrap スキル自体のフロー改善
 
-**新規ラベルは AI 側で勝手に作成しない**。改善すべき原料が plugin 内蔵スキル等で `source:` ラベルが未整備の領域だった場合は、`source:` ラベルを **省略** し、本文の「対象」セクションで対象原料パスを明記する。新規ラベル体系の整備（例: `source:skills` のような単一カテゴリラベルにするか否か）は別途人間側で意思決定する事項であり、本スキルが先回りで決めない。`gh label create` を含む応答は禁止。
+**新規ラベルは AI 側で勝手に作成しない**。`source:<name>` を付与する前に、リポジトリに当該ラベルが実在するかを `gh label list --repo foo-543674/foo-skills`（または GitHub MCP の `list_labels`）で必ず確認する。実在しなければ **省略** し、本文の「対象」セクションで対象原料パスを明記する。上記リスト中の `<file>` はプレースホルダであり具体ラベル名ではない。`source:philosophy/<file>` のような形をテンプレートに当てはめて推測ラベルを生成してはならない（例: `source:perspectives/testing` を付与してよいのは `gh label list` で実在を確認できた場合のみ）。新規ラベル体系の整備（例: `source:skills` のような単一カテゴリラベルにするか否か）は別途人間側で意思決定する事項であり、本スキルが先回りで決めない。`gh label create` を含む応答は禁止。
 
 ### Step 6: 結果の要約表示
 
