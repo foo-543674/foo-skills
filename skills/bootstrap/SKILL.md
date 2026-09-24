@@ -165,7 +165,10 @@ AI コンテキスト基盤が整ったら、技術インフラの構築に進�
    - linter/formatter/型チェッカーの設定
    - テストフレームワークの設定とサンプルテスト
 2. AGENTS.md の「開発コマンド一覧」を実際のコマンドで埋める (CLAUDE.md / GEMINI.md は `@AGENTS.md` で import しているため自動的に反映される)
-3. `.claude/settings.json` の許可コマンドを設定する
+3. `.claude/settings.json` の許可コマンドを設定する。判定の問いは「**この操作が確認なしで走ったとき、ユーザーが手作業でやり直す羽目になるものはあるか**」:
+   - **allow に入れてよいのは非破壊操作のみ**: 読み取り・調査・検証 (`git status` / `git diff` / `git log`、`ls` / `find` / `rg`、`docker compose ps` / `logs` / `exec`、テスト・lint・型チェック等)
+   - **allow に入れない**: コンテナ / インフラのライフサイクル操作 (`docker compose down` / `up` / `restart` / `rm` / `prune`)、履歴・作業ツリーの破壊 (`git push --force` / `git reset --hard` / `git clean` / `git checkout -- .`)、ボリューム・DB・環境の削除。これらは ask に残すか deny にする。`up -d` も対象: devcontainer CLI が起動したコンテナは素の compose ファイルと config hash が一致せず、作り直される (resources/known-pitfalls.md 参照)
+   - deny は「ホストを汚さない」(パッケージマネージャの直接実行等) だけでなく「**ユーザーの実行環境・セッションを壊さない**」観点でも組む。片方の観点だけが効いている状態にしない
 4. 動作確認: すべてのコマンドが成功することを確認
 
 **受け入れ基準**: 「今すぐコーディングに移って技術品質が保たれる状態になっているか」
