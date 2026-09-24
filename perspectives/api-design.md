@@ -70,7 +70,7 @@ BFF のプレフィックスは「誰向けか」を明示する (`/web/v1`, `/m
 - **Status Code Abuse**: ドメインエラーの細分類に HTTP ステータスを使う
 - **Mixed Verb and Resource Paths**: `/api/v1/users` と `/api/v1/auth/login` が同じ名前空間
 - **ORM Type Leak / SDK DTO Leak**: 内部実装の型がレスポンスに露出
-- **Domain = DTO Conflation**: ドメイン型と API DTO を兼用
+- **Domain = DTO Conflation**: ドメイン型と API DTO を兼用。ドメインの変更理由と API 契約の変更理由は別なので、今は形が同じでも統合しない (philosophy/core-principles の逃げ I「偶然の一致の同一視」の一事例)
 
 ## 品質チェックポイント
 
