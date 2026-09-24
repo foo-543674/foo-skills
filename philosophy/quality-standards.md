@@ -49,6 +49,7 @@ Layer 2: Architecture Tests (ガードレール)
 
 Layer 3: Code Review Agent (評価)
   テストでは捉えきれない設計品質を評価する
+  → commit / push 前に hook で起動を強制する (手元のレビューゲート)
   → 人間の最終判断を支援
 ```
 

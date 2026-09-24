@@ -99,6 +99,7 @@ philosophy/ と perspectives/ を読み込み、このプロジェクトに何�
      - **設定ファイル・ベンダー固有 DSL・スキーマに踏み込むレビューは、必ず該当する公式ドキュメントまたはスキーマを参照してから指摘する**。推測でモノを言わない (対象例: Claude Code permission DSL, OpenAPI スキーマ, Cargo.toml, package.json, terraform プロバイダ DSL 等)
      - レビュー間で指摘内容が矛盾する場合、その原因はほぼ常に「最初に仕様を確認していない」ことなので、確認を経てから指摘する
      - 仕様を確認せず推測で述べる場合は「未確認だが」と明示する
+   - この code-reviewer は Phase 5 のローカルレビューゲート (`resources/local-review-gate.md`) から呼ばれる主体でもある。レビュー結果の冒頭に非決定性のメタ注記を出し、対象 diff のハッシュと判定 (Critical / Important / Minor の件数) をレビュー記録として残す動作を含める
 5. **自然言語の使用範囲を AGENTS.md に埋め込む**:
    - ドキュメント / ローカライズファイルはプロジェクトの公用語可、ソースコード・コメント・識別子・コミットメッセージは英語のみ、という境界を明文化する
    - bootstrap 時にプロジェクトの公用語を確認し、`resources/context-template.md` をもとに生成する **AGENTS.md の表** をプロジェクトに合わせて調整する (テンプレート自体は変更しない)
@@ -163,13 +164,14 @@ AI コンテキスト基盤が整ったら、技術インフラの構築に進�
 
 例外は **失敗がユーザーの作業環境の破壊に直結する領域** (開発コンテナ、ローカル実行環境、permissions)。ここだけは「AI が知識から導出する」に任せず、最小限の制約を原料 (下記の各項目と `resources/known-pitfalls.md`) に残す。導出が間違うと、ユーザーが作業中の環境が落ちて手作業でやり直す羽目になるため。
 
-`${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/resources/known-pitfalls.md` に既知の落とし穴が登録されている。技術インフラ構築時に該当する技術 (Copilot Coding Agent 連携、claude-code-action 等) を扱う場合は該当エントリを参照する。
+`${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/resources/known-pitfalls.md` に既知の落とし穴が登録されている。技術インフラ構築時に該当する技術 (Copilot Coding Agent 連携、claude-code-action 等) を扱う場合は該当エントリを参照する。レビューは `resources/local-review-gate.md` の設計基準に従い、commit / push の直前に手元で強制する。**リモート (GitHub Actions 等) の AI レビュー workflow は生成しない** (チーム開発前提のリモートレビューは別途設計、保留中)。
 
 **やること**:
 1. 技術インフラの構築 (必要なものだけ):
    - devcontainer (開発環境のコンテナ化)。制約: エディタの devcontainer とローカル実行 (手動 `docker compose`) は **別の Compose プロジェクト** にする。同じプロジェクトに統合すると片方の `down` がもう片方を壊す (逃げ J)。ポートを publish するのは片方だけ。Docker outside of Docker は devcontainer の `features` で入れ、ソケットを手でマウントしない
    - docker-compose (ローカルインフラ)。上記の分離を保ったまま、devcontainer からローカル実行を起動できる構成にする
    - CI パイプライン (lint, test, format, type check, architecture tests)
+   - ローカルレビューゲート: git hook (pre-commit / pre-push) で決定的ゲートとレビュー記録の確認を行い、Claude Code の PreToolUse hook (`Bash` の `git commit` / `git push`) で同じ結果を AI に差し戻す。設計は `resources/local-review-gate.md`。迂回経路 (`--no-verify` 等) は permissions の deny で塞ぐ
    - linter/formatter/型チェッカーの設定
    - テストフレームワークの設定とサンプルテスト
    - 設計成果物の構造化フォーマットの選定と雛形 (例: HTTP API → `openapi.yaml`、RDB → `schema.dbml` / `schema.prisma`、受け入れ基準 → Gherkin)。設計文書を `.md` で作る前に、philosophy/development-values の「成果物のフォーマットは構造化を先に検討する」の 3 問を通す。`.contexts/api-design.md` を生成する代わりに `openapi/openapi.yaml` の雛形を生成する、が既定の向き
