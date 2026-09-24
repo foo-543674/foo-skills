@@ -76,7 +76,7 @@ bootstrap が生成する **`AGENTS.md` (プロジェクト指示の原典)** �
 
 ### push 前に必ずローカルで全部通す
 
-**リモート CI や AI Review は防壁であって、1 次フィードバックループではない。** 手元で見つけられた指摘をリモートに発見させると、1 件あたり数分〜十数分の往復が指摘数だけ積み上がる。push 前に、そのタスク種別で意味のあるローカル検証を全部通す。
+**リモート CI は防壁であって、1 次フィードバックループではない。** 手元で見つけられた指摘をリモートに発見させると、1 件あたり数分〜十数分の往復が指摘数だけ積み上がる。push 前に、そのタスク種別で意味のあるローカル検証を全部通す。AI レビューもリモートではなく手元で、commit / push の直前に走る (下記「レビューゲート」)。
 
 **同種の指摘を 2 ラウンド連続で受けたら全件スイープ。** 個別修正をやめて、その観点で全文を grep / 全箇所突き合わせし、発見した全件を一度に潰す。リモートに同じカテゴリの指摘を 2 度させない。
 
@@ -93,6 +93,19 @@ push 前に最低限通すべき検証。タスクが複数種別にまたがる
 | DB マイグレーション変更 | マイグレーション適用 + ORM スキーマ再生成 + 既存テストの再実行 |
 
 [プロジェクトの技術スタックに応じて上記表を具体化する。例: backend = `cargo fmt + cargo clippy + cargo nextest + cargo test --test arch`, frontend = `pnpm format + pnpm lint + pnpm typecheck + pnpm test + pnpm arch:test`, OpenAPI = `redocly lint`, migration = `db-migrate(-test) + db-prepare`]
+
+### レビューゲート (commit / push は hook で止まる)
+
+`git commit` と `git push` は git hook と Claude Code hook で守られている。止められたら次の順で対応し、**迂回しない**:
+
+1. 決定的ゲート (format / lint / 型チェック / テスト / アーキテクチャテスト) の失敗は、その場で直して再実行する
+2. 「レビュー記録がない」で止まったら、code-reviewer エージェントに対象 diff (commit なら staged 分、push なら base ブランチとの差分) をレビューさせる。記録は code-reviewer だけが書く。手書き・改変は禁止
+3. Critical は直してから再レビュー。Important は直すか、直さない理由をコミットメッセージ本文に残す。Minor は任意
+4. diff を変えたら再レビュー。修正後に古い記録で commit しない
+
+禁止: `--no-verify` / `-n`、`core.hooksPath` の変更、hook の無効化・緩和、レビュー記録の手書き。「hook が失敗するから外す」は逃げであり、hook のステップに付いている `# DO NOT REMOVE OR WEAKEN:` コメントの通り、レビュー未実施を成功扱いにしてはならない。
+
+レビュー結果は LLM ベースで非決定的。再実行で別の指摘が出ることがある。同じカテゴリの指摘が 2 回続いたら個別対応をやめて全件スイープする。
 
 ## アーキテクチャ
 

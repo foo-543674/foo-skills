@@ -44,3 +44,5 @@
 - [ ] AGENTS.md の「開発コマンド」が実際のコマンドで埋まっている (CLAUDE.md / GEMINI.md は `@AGENTS.md` で連動)
 - [ ] .claude/settings.json の許可コマンドが設定されている
 - [ ] known-pitfalls.md の該当エントリを確認し、該当する場合は回避策を適用した
+- [ ] ローカルレビューゲートが有効: git hook (pre-commit / pre-push) が決定的ゲートとレビュー記録を確認し、Claude Code PreToolUse hook が `git commit` / `git push` を差し戻す。迂回 (`--no-verify` / `core.hooksPath`) が deny されている (local-review-gate.md)
+- [ ] リモートの AI レビュー workflow を生成していない
