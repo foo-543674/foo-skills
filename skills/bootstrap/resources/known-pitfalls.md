@@ -6,6 +6,19 @@ bootstrap 中に AI と人間の双方が参照する「既知の CI/Infra 落�
 
 ## CI/Infra Pitfalls
 
+### devcontainer と手動 `docker compose` を同じ Compose プロジェクトに統合する
+
+- **症状**: エディタの devcontainer とローカル実行 (手動 `docker compose up`) が同じポートを publish して衝突する。これを解消するために `.devcontainer/compose.yaml` に `name:` を明示して両者を 1 つの Compose プロジェクトに統合すると、片方から `docker compose down` を打った時点でもう片方 (ユーザーが作業中の devcontainer) が破棄される。衝突ではなく「開発環境とローカル実行は別物」という区別が消えている (philosophy/core-principles 逃げ J)
+  - `up -d` も同種の危険を持つ: devcontainer CLI は override 込みの設定でコンテナを起動するため、素の compose ファイルから計算した config hash と稼働中コンテナのラベル (`com.docker.compose.config-hash`) が一致せず、`up -d` がコンテナを作り直す (実測済み)
+  - devcontainer CLI は compose ファイルの `name:` を尊重する。「VS Code が独自の名前で上書きするから `name:` は無視される」は誤り (この誤った主張がコメントに断定形で残り、後続セッションの `down` の根拠になった — 逃げ G)
+- **回避策**:
+  - 開発環境とローカル実行は別の Compose プロジェクト (別ディレクトリ、または別 `name:`) にする。統合は最後の手段で、するなら ADR に 3 点 (理由 / 代替案 / 見直しトリガー) を残す
+  - ポートを publish するのは片方だけ。競合解消は「分離を保ったまま競合点だけ動かす → 片方を止める → 統合」の順
+  - Docker outside of Docker は devcontainer の `features` (`docker-outside-of-docker`) で入れる。ソケットの手動マウントはしない
+  - `docker compose down` / `up` を `.claude/settings.json` の allow に入れない (bootstrap SKILL Phase 5 step 3)
+- **検出方法**: `docker compose ls` で devcontainer と手動起動が同じプロジェクト名に見える。または AI が「検証用コンテナを停止した」と報告した直後にエディタとの接続が切れる
+- **参考**: finance-simulator (foo-skills Issue #58 / #59 / #61)
+
 ### `anthropics/claude-code-action` + Copilot Coding Agent
 
 - **症状**: Copilot Coding Agent が author の commit を pull_request event で processing するとき、`anthropics/claude-code-action@v1` が 2 段階で連続失敗する
