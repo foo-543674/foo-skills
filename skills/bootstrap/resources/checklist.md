@@ -25,6 +25,7 @@
 - [ ] 派生生成系ファイルの冒頭に「派生元: AGENTS.md / 再 bootstrap で再同期」を明記している
 - [ ] コミット規約が AGENTS.md に含まれている
 - [ ] AI の判断委任範囲が AGENTS.md に明示されている
+- [ ] 設計成果物の役割分担 (canonical 領域 / 実装計画のスコープ / 3 階層の目的) が AGENTS.md に含まれ、技術スタックに合わせて具体化されている
 - [ ] .contexts/bootstrap-decisions.md に判断記録が残されている
 
 ## Phase 4: Generate Architecture Tests
