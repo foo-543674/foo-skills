@@ -43,5 +43,5 @@
 - [ ] **再現する**: devcontainer 等で別環境でも同じ結果になる
 - [ ] **見える**: ログ・エラー・テストレポートが読める
 - [ ] AGENTS.md の「開発コマンド」が実際のコマンドで埋まっている (CLAUDE.md / GEMINI.md は `@AGENTS.md` で連動)
-- [ ] .claude/settings.json の許可コマンドが設定されている
+- [ ] .claude/settings.json の allow が非破壊操作のみで構成されている (コンテナのライフサイクル操作・履歴破壊・環境削除は ask / deny)
 - [ ] known-pitfalls.md の該当エントリを確認し、該当する場合は回避策を適用した
