@@ -164,6 +164,7 @@ AI コンテキスト基盤が整ったら、技術インフラの構築に進�
    - CI パイプライン (lint, test, format, type check, architecture tests)
    - linter/formatter/型チェッカーの設定
    - テストフレームワークの設定とサンプルテスト
+   - 設計成果物の構造化フォーマットの選定と雛形 (例: HTTP API → `openapi.yaml`、RDB → `schema.dbml` / `schema.prisma`、受け入れ基準 → Gherkin)。設計文書を `.md` で作る前に、philosophy/development-values の「成果物のフォーマットは構造化を先に検討する」の 3 問を通す。`.contexts/api-design.md` を生成する代わりに `openapi/openapi.yaml` の雛形を生成する、が既定の向き
 2. AGENTS.md の「開発コマンド一覧」を実際のコマンドで埋める (CLAUDE.md / GEMINI.md は `@AGENTS.md` で import しているため自動的に反映される)
 3. `.claude/settings.json` の許可コマンドを設定する
 4. 動作確認: すべてのコマンドが成功することを確認
