@@ -11,6 +11,7 @@
   philosophy/    私の価値観・判断基準
   perspectives/  品質レンズ (設計にもレビューにも使う)
   bootstrap      プロジェクトに AI 自走基盤を生成するスキル
+  ai-box         AI を GitHub App としてだけ GitHub に触れさせる端末側の実行環境を作るスキル
 
 プロジェクトの中 (生成物)
   AGENTS.md (原典), CLAUDE.md / GEMINI.md (@AGENTS.md import)
@@ -40,6 +41,10 @@ architecture, api-design, data-modeling, component, disposability, testing, erro
 ### skills/bootstrap — AI 自走基盤の生成器
 
 `/foo-skills:bootstrap` で起動。5 Phase でプロジェクトに AI コンテキストを生成する。
+
+### skills/ai-box — AI の実行環境を端末側で分離する
+
+`/foo-skills:ai-box` で起動。Claude Code / Codex を、GitHub に権限を絞った GitHub App としてしか触れないコンテナで動かす環境 `~/ai-box/` を構築する。オーナーの認証から AI を切り離し、bootstrap が生成するリモートの受け入れ判定で AI のマージを止められるようにする前提を作る。
 
 ## 使い方
 

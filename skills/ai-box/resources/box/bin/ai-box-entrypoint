@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Seed config from the host extract (./seed). Re-run with AI_BOX_RESEED=1.
+# Seeded files are replaced as a whole so that a key or file removed on the host is removed here too.
+seed_version=2
+if [ "$(cat "$HOME/.ai-box-seeded" 2>/dev/null)" != "$seed_version" ] || [ "${AI_BOX_RESEED:-}" = "1" ]; then
+  mkdir -p "$HOME/.claude" "$HOME/.codex"
+  # seed v1 copied raw host files (incl. Codex config.toml); drop them before applying the allow-listed extract
+  [ -f "$HOME/.ai-box-seeded" ] && [ ! -s "$HOME/.ai-box-seeded" ] && rm -f "$HOME/.codex/config.toml"
+  for f in settings.json CLAUDE.md; do
+    rm -f "$HOME/.claude/$f"
+    [ -f "/seed/claude/$f" ] && cp "/seed/claude/$f" "$HOME/.claude/$f"
+  done
+  [ -f "$HOME/.claude.json" ] || echo '{"hasCompletedOnboarding":true}' > "$HOME/.claude.json"
+  echo "$seed_version" > "$HOME/.ai-box-seeded"
+fi
+
+# Commit as the App's bot user.
+if ! git config --global user.name >/dev/null 2>&1; then
+  if slug=$(curl -fsS -H "Authorization: Bearer $(gh-app-token --jwt)" https://api.github.com/app | jq -er .slug) \
+     && id=$(curl -fsS -H "Authorization: Bearer $(gh-app-token)" "https://api.github.com/users/${slug}%5Bbot%5D" | jq -er .id); then
+    git config --global user.name "${slug}[bot]"
+    git config --global user.email "${id}+${slug}[bot]@users.noreply.github.com"
+  else
+    echo "ai-box: could not resolve the App bot identity; check secrets/.env and the private key" >&2
+  fi
+fi
+
+# Optional: clone and enter a repository (AI_BOX_REPO=owner/name).
+if [ -n "${AI_BOX_REPO:-}" ]; then
+  dir="$HOME/work/${AI_BOX_REPO}"
+  [ -d "$dir/.git" ] || git clone "https://github.com/${AI_BOX_REPO}.git" "$dir"
+  cd "$dir"
+fi
+
+exec "$@"

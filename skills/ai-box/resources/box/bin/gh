@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# gh wrapper: always act as the GitHub App, never as a human.
+GH_TOKEN=$(gh-app-token) || exit 1
+export GH_TOKEN
+exec /usr/bin/gh "$@"

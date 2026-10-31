@@ -1,0 +1,16 @@
+services:
+  ai:
+    build: .
+    image: ai-box:latest
+    env_file: [secrets/.env]
+    volumes:
+      # Home lives in a named volume: Claude/Codex login, plugins and clones survive rebuilds.
+      # Host config dirs are never mounted writable: hooks written there would run on the host
+      # with the owner's credentials.
+      - ai-home:/home/node
+      - ./secrets/app-private-key.pem:/run/ai-box-secrets/app-private-key.pem:ro
+      - ./seed:/seed:ro
+    stdin_open: true
+    tty: true
+volumes:
+  ai-home:

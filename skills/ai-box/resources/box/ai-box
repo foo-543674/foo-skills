@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+# ai-box: run Claude Code / Codex in a container that can reach GitHub only as the GitHub App.
+set -euo pipefail
+here="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+compose() { docker compose -f "$here/compose.yaml" "$@"; }
+
+usage() {
+  cat <<'USAGE'
+usage: ai-box <command> [owner/repo] [args...]
+
+  build                     build (or rebuild) the image; also updates Claude Code and Codex
+  seed                      copy host settings (Claude settings.json / CLAUDE.md, Codex config.toml)
+                            into ./seed and apply them on the next start
+  codex-login               log Codex in inside the container (device code), once
+  check                     verify the App token, the bot identity and that no owner credentials leak in
+  claude [owner/repo] ...   start Claude Code (clones the repo into the container on first use)
+  codex  [owner/repo] ...   start Codex
+  shell  [owner/repo]       open a shell
+USAGE
+}
+
+require_secrets() {
+  [ -f "$here/secrets/.env" ] || { echo "missing $here/secrets/.env (see env.example)" >&2; exit 1; }
+  [ -f "$here/secrets/app-private-key.pem" ] || { echo "missing $here/secrets/app-private-key.pem" >&2; exit 1; }
+}
+
+run() {
+  local repo_env=()
+  if [ $# -gt 0 ] && [[ "$1" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
+    repo_env=(-e "AI_BOX_REPO=$1"); shift
+  fi
+  require_secrets
+  local tty=(); [ -t 0 ] || tty=(-T)
+  compose run --rm "${tty[@]}" "${repo_env[@]}" ai "$@"
+}
+
+cmd="${1:-}"; shift || true
+case "$cmd" in
+  build) compose build --pull --no-cache ;;
+  seed)
+    # Only allow-listed, non-secret settings enter the box. Raw host config files are never
+    # mounted or copied: they can hold env vars, auth headers or MCP credentials.
+    mkdir -p "$here/seed/claude"
+    rm -f "$here/seed/claude/settings.json" "$here/seed/claude/CLAUDE.md" "$here/seed/codex/config.toml"
+    if [ -f "$HOME/.claude/settings.json" ]; then
+      docker run --rm --network none --entrypoint jq -v "$HOME/.claude/settings.json:/in.json:ro" ai-box:latest \
+        '{model, enabledPlugins, extraKnownMarketplaces} | with_entries(select(.value != null))' /in.json \
+        > "$here/seed/claude/settings.json"
+    fi
+    # CLAUDE.md is copied as-is: it is instructions, keep secrets out of it.
+    [ -f "$HOME/.claude/CLAUDE.md" ] && cp "$HOME/.claude/CLAUDE.md" "$here/seed/claude/CLAUDE.md"
+    require_secrets
+    compose run --rm -T -e AI_BOX_RESEED=1 ai true
+    echo "seeded: $(ls "$here/seed/claude" | tr '\n' ' ')" ;;
+  codex-login) run codex login --device-auth ;;
+  check)
+    run bash -c '
+      fail=0
+      ok()  { echo "  ok: $1"; }
+      ng()  { echo "  NG: $1"; fail=1; }
+      echo "== App token";    gh-app-token >/dev/null 2>&1 && ok "issued" || ng "token could not be issued"
+      echo "== bot identity"
+      name=$(git config --global user.name || true); email=$(git config --global user.email || true)
+      [[ "$name" == *"[bot]" && "$email" == *"[bot]@users.noreply.github.com" ]] && ok "$name <$email>" || ng "git identity is not the App bot: $name <$email>"
+      echo "== repositories reachable with this installation"
+      repos=$(gh api /installation/repositories --jq ".repositories[].full_name" 2>&1) && echo "$repos" | sed "s/^/  /" || ng "cannot list repositories: $repos"
+      echo "== owner credentials (checked locations only)"
+      [ -z "${SSH_AUTH_SOCK:-}" ]            && ok "no ssh-agent"       || ng "ssh-agent is forwarded"
+      [ ! -e "$HOME/.ssh" ]                  && ok "no ~/.ssh"          || ng "~/.ssh exists"
+      [ ! -e "$HOME/.config/gh/hosts.yml" ]  && ok "no gh hosts.yml"    || ng "gh hosts.yml exists"
+      [ ! -e /var/run/docker.sock ]          && ok "no docker.sock"     || ng "docker.sock is mounted"
+      env | grep -qE "^(GH_TOKEN|GITHUB_TOKEN|GH_ENTERPRISE_TOKEN)=" && ng "a GitHub token is set in the environment" || ok "no GitHub token in the environment"
+      grep -qiE "token|secret|password|authorization" "$HOME/.claude/settings.json" 2>/dev/null && ng "~/.claude/settings.json mentions credentials" || ok "seeded settings carry no credential keys"
+      echo "== Claude / Codex"
+      claude --version >/dev/null 2>&1 && ok "claude $(claude --version)" || ng "claude not runnable"
+      codex login status >/dev/null 2>&1 && ok "codex logged in" || ng "codex is not logged in (ai-box codex-login)"
+      exit $fail
+    ' ;;
+  claude|codex|shell)
+    tool="$cmd"; [ "$tool" = shell ] && tool=bash
+    if [ $# -gt 0 ] && [[ "$1" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
+      repo="$1"; shift; run "$repo" "$tool" "$@"
+    else
+      run "$tool" "$@"
+    fi ;;
+  ""|-h|--help|help) usage ;;
+  *) echo "unknown command: $cmd" >&2; usage; exit 1 ;;
+esac
