@@ -27,6 +27,7 @@ foo-skills/
 │   ├── technology-choices.md      #   Static typing, FP, tech selection criteria
 │   ├── quality-standards.md       #   Product vs technical quality, three-layer defense
 │   └── development-values.md      #   Vertical slicing, test-first, 0→0.1 / 99.9→100
+├── evals/                         # Eval cases built from real failures (claude plugin eval)
 ├── perspectives/                  # Source material: quality lenses (20 files)
 │   ├── architecture.md            #   Layering by origin of operations, dependency direction
 │   ├── api-design.md              #   Contract clarity, HTTP status semantics
@@ -72,8 +73,10 @@ foo-skills/
 
 ## Feedback Reflection
 
-When receiving feedback about philosophy or perspectives content:
+When receiving feedback about philosophy, perspectives or skill content:
 
-1. Fix the target file
-2. If the feedback is a general rule, update this CLAUDE.md
-3. Check if other files violate the same rule and fix them
+1. Turn the real failure into an eval case under `evals/` (see `evals/README.md`) and run it on the current sources (`claude plugin eval . --case <name>`). Only real incidents; never invent cases. If the failure cannot be reproduced as a case, say why in the PR
+2. Fix the target file
+3. Run the same case the same number of times and compare. Do not judge from a single run (LLM output varies)
+4. If the feedback is a general rule, update this CLAUDE.md
+5. Check if other files violate the same rule and fix them
