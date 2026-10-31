@@ -11,7 +11,7 @@ RUN apt-get update \
 # rootless Podman. Single-UID mode (no subuid range): newuidmap needs CAP_SYS_ADMIN inside Docker,
 # which the box must not have. See SKILL.md "プロジェクトのコマンドを動かす仕組み".
 RUN sed -i '/^node:/d' /etc/subuid /etc/subgid
-COPY containers/ /etc/containers/
+COPY containers/ /etc/ai-box/containers/
 
 # Updated by rebuilding the image (ai-box build), not by self-update.
 RUN npm install -g @anthropic-ai/claude-code @openai/codex && npm cache clean --force

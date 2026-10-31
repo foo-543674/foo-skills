@@ -82,7 +82,7 @@ ai-box check; echo "exit=$?"
 
 - `repositories` に出るのは、App をインストールしたリポジトリ (ここでは `<owner>/ai-box-sandbox`) だけ
 - `bot identity` は `<slug>[bot] <数字+<slug>[bot]@users.noreply.github.com>`
-- `project containers` の 3 行がすべて `ok:` (箱に `CAP_SYS_ADMIN` がなく、seccomp が効いたまま、Podman が名前空間を作れる)
+- `project containers` の 4 行がすべて `ok:` (箱に `CAP_SYS_ADMIN` がなく、seccomp が効いたまま、Podman が名前空間を作れる、ストレージ設定が効いている)
 
 ## 7. 実際に bot として PR を作れるか
 
