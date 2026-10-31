@@ -71,6 +71,13 @@ foo-skills/
 - Keep the invariants in SKILL.md. Before changing `resources/box/`, run `ai-box check` and `resources/setup.md` steps 6-8 on a real machine
 - Never put secrets or owner-specific values in resources
 
+## Working on this repository
+
+- Develop from ai-box (`ai-box claude foo-543674/foo-skills`) so that PRs are opened by the GitHub App, not the owner. The ruleset requires the owner's approval; auto-merge is enabled, so an approved PR merges without further interaction
+- Do not stop to ask "may I merge?" after each PR. Stack dependent work on the unmerged branch and list waiting PRs (stacked order and merge order) at a break
+- Enable auto-merge only on PRs whose base is `main`. Approving a stacked PR would merge it into the branch below it. After the PR below merges, retarget the next one to `main`, then enable its auto-merge
+- PRs opened from the host with the owner's credentials cannot be approved by the owner; they merge only through the admin bypass
+
 ## Feedback Reflection
 
 When receiving feedback about philosophy, perspectives or skill content:
