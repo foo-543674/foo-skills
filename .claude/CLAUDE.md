@@ -32,11 +32,14 @@ foo-skills/
 │   ├── api-design.md              #   Contract clarity, HTTP status semantics
 │   └── ...                        #   (18 more perspectives)
 └── skills/
-    └── bootstrap/                 # Engine: generates AI context into projects
+    ├── bootstrap/                 # Engine: generates AI context into projects
+    │   ├── SKILL.md
+    │   └── resources/             #   context-template, checklist, review/acceptance contracts, ...
+    ├── consult/                   # Thinking partner from vague ideas to concrete design
+    ├── skill-feedback/            # Files owner feedback as Issues on this repo
+    └── ai-box/                    # Per-machine container that reaches GitHub only as a GitHub App
         ├── SKILL.md
-        └── resources/
-            ├── context-template.md
-            └── checklist.md
+        └── resources/box/         #   Verified implementation, shipped as-is
 ```
 
 ## Editing Rules
@@ -56,10 +59,16 @@ foo-skills/
 
 ### skills/bootstrap/
 
-- The only skill in this plugin
+- The main skill: the engine of this plugin
 - Generates project-specific context (CLAUDE.md, agents, architecture tests, tool-agnostic files)
 - References philosophy/ and perspectives/ as source material
 - Does NOT contain How for technical infrastructure (AI derives that from its own knowledge)
+
+### skills/ai-box/
+
+- Exception to "no How": ships a verified implementation (`resources/box/`) as-is, because mistakes that break the credential boundary (agent forwarding, writable config mounts) are silent and the box does not vary by tech stack
+- Keep the invariants in SKILL.md. Before changing `resources/box/`, run `ai-box check` and `resources/setup.md` steps 6-8 on a real machine
+- Never put secrets or owner-specific values in resources
 
 ## Feedback Reflection
 

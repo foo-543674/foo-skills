@@ -1,0 +1,83 @@
+---
+name: ai-box
+description: Claude Code / Codex を、GitHub に GitHub App (AI 専用の別主体) としてしか触れないコンテナで動かす実行環境 ai-box を端末に構築・更新・移行する。「AI をオーナーの認証から切り離したい」「ai-box を作って」「別の端末で ai-box を使いたい」「端末を引っ越す」ときに使う。`/foo-skills:ai-box` で起動。
+---
+
+# ai-box — AI をオーナーの認証から切り離す実行環境
+
+端末に、AI 用のコンテナ環境 `~/ai-box/` を構築する。コンテナの中の Claude Code / Codex は、GitHub に **権限を絞った GitHub App としてだけ** 触れ、オーナーの gh トークン・SSH 鍵・ssh-agent には届かない。
+
+## Why: なぜ必要か
+
+リモートの受け入れ保証が境界になるかは、置き場所ではなく AI の資格情報で決まる (`bootstrap/resources/remote-acceptance.md`「境界は場所ではなく資格情報で決まる」)。AI がオーナーと同じ OS ユーザーで動いていれば、ruleset も CODEOWNERS も AI が迂回・承認できる。ai-box はその前提を端末の側で作る。
+
+## このスキルが How を持つ理由
+
+このプラグインは原則として How を置かない。ai-box は例外で、検証済みの実装 (`resources/box/`) をそのまま配る。
+
+- 境界を崩す誤り (ssh-agent の転送、設定ディレクトリの書き込み可能なマウント等) は、導出を少し間違えるだけで静かに入り、動作には現れない
+- 技術スタックで形が変わらないので、毎回導出させる利点がない
+
+実装を変えるときは、下の「破ってはいけない条件」を保ち、`ai-box check` と `resources/setup.md` の手順 6〜8 を通してから反映する。
+
+## 破ってはいけない条件
+
+- ホストの `~/.claude`・`~/.codex`・作業中のリポジトリを **マウントしない**。書き込み可能なら、コンテナの AI が書いた hook や `.git/hooks` がオーナーの認証でホスト上で動く。読み取り専用でも、設定ファイルに書かれた環境変数・認証ヘッダー・MCP の資格情報が読める
+- 設定は **許可した非秘密の項目だけ** を抜き出して渡す (`settings.json` の `model` / `enabledPlugins` / `extraKnownMarketplaces`)。元の設定ファイルは箱に入れない。`CLAUDE.md` は指示文としてそのまま渡すので、秘密を書かない
+- ssh-agent・`~/.ssh`・gh の `hosts.yml`・docker.sock をコンテナに入れない。VS Code Dev Containers は既定で ssh-agent と git 認証を転送するので使わない
+- コンテナ内の gh と git は App のトークンだけを使う。App の情報がなければ失敗させ、別の認証に切り替えない
+- **ai-box 専用の App を使う。** 箱の中の AI は秘密鍵を読めるので、Installation ID の指定に関係なく、App のすべてのインストール先に App の全権限で届く。インストール先と権限の全体が「AI に渡してよい範囲」になるように保つ
+- App に Administration・Checks / Commit statuses の write・Secrets / Variables / Environments を与えない。ruleset の bypass に App を入れない
+- ai-box の置き場所 (と、それを管理するリポジトリがあればそれ) に App をインストールしない。AI が自分の箱を書き換えられる
+- AI が作業するリポジトリはコンテナ内で App の権限で clone する。オーナーとのやり取りは PR だけ
+- 秘密鍵・トークンは `~/ai-box/secrets/` (権限 700 / 600) に置き、どのリポジトリにも Docker のビルドコンテキストにも入れない (`.dockerignore`)
+
+箱の中の AI が、読める鍵やトークンを意図的にリポジトリや外部へ持ち出すことは、この構成では機構的に防げない。被害は App の権限とインストール先の範囲に限られ、鍵を失効すれば止められる。`ai-box check` が確かめるのは、表示している場所にオーナーの資格情報がないことまでで、それ以外の場所に無いことは保証しない。
+
+## 秘密情報の扱い
+
+このスキルを実行する AI は、秘密情報の値に触れない。
+
+- 秘密鍵の作成、`claude setup-token`、`secrets/.env` の作成はユーザーが自分のターミナルで行う。手順は `resources/setup.md` を示す
+- 会話に貼らせない。`!` 付きで実行させない (出力が会話の記録に残る)
+- 確認は `ai-box check` の出力 (値を含まない) で行う
+
+## 手順
+
+### 1. 前提を確かめる
+
+- `docker` と `docker compose` が使えること
+- 既に `~/ai-box/` があれば、`resources/box/` との差分を示し、上書きしてよいかをユーザーに確かめる。`secrets/` と Docker ボリューム (`ai-box_ai-home`) には触れない
+
+### 2. 配置する
+
+- `resources/box/` の中身を `~/ai-box/` にコピーし、`ai-box` と `bin/*` に実行権限を付ける
+- `mkdir -m 700 ~/ai-box/secrets ~/ai-box/seed`、`env.example` を `secrets/` にも置く
+- `~/.local/bin/ai-box` に `~/ai-box/ai-box` へのシンボリックリンクを張る (PATH に無ければ伝える)
+- `ai-box build` でイメージを作る
+
+### 3. ユーザーに渡す
+
+`resources/setup.md` の手順 1〜5 (App の権限、検証用リポジトリへのインストール、秘密鍵、Claude トークン、`.env`) をユーザーに示す。`<owner>` と App の slug は、ユーザーの環境に合わせて書き換えて示す。ホスト側の gh のバージョンには依存しない手順にしてある。
+
+### 4. 確かめる
+
+ユーザーが手順 6 (`ai-box seed` / `ai-box codex-login`) を済ませたら、`ai-box check` を実行する。必須の検査が 1 つでも失敗すれば非 0 で終わるので、終了コードで判定する。続けて手順 7 (bot として PR を作れること、管理者の操作が `403 Resource not accessible by integration` になること) と手順 8 (Claude Code がログインなしで起動し、プラグインが入っていること) を確かめる。
+
+### 5. 境界の状態を伝える
+
+ai-box ができても、それだけでマージを止められるとは限らない。対象リポジトリごとに次を伝える。
+
+- ruleset・ブランチ保護が使えるか。GitHub Free の private リポジトリでは使えず、App の権限を絞っても base への直接 push や自分の PR のマージを止められない (`remote-acceptance.md`「可視化のみ」)
+- 境界にするための選択肢 (プランの変更、公開範囲の変更) と、その判断はユーザーのものであること
+
+## 別の端末で使う・端末を移る
+
+- **秘密鍵はコピーしない。** 端末ごとに App の設定ページで新しい鍵を発行する。手放す端末の鍵だけを失効できる
+- Claude トークンも端末ごとに `claude setup-token` で発行する。App ID と Installation ID は同じ値でよい
+- 新しい端末ではこのスキルを実行し、手順 3 以降を行う
+- 古い端末を手放す前に、コンテナ内の clone に push していない変更がないか確かめる (`ai-box shell` で `git status` / `git log --branches --not --remotes`)。その後、その端末の鍵を App の設定から削除し、`docker volume rm ai-box_ai-home` と `~/ai-box/secrets/` の削除を行う
+
+## 更新
+
+このスキルを再実行すると、手順 1 で差分を示して `~/ai-box/` を更新する。Claude Code と Codex の更新は `ai-box build` (イメージの作り直し) で行う。

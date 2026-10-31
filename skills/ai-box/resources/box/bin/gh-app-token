@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Print a GitHub App installation token (cached until 5 minutes before expiry).
+# --jwt prints the app-level JWT instead.
+set -euo pipefail
+: "${GH_APP_ID:?GH_APP_ID is not set (secrets/.env)}"
+: "${GH_APP_INSTALLATION_ID:?GH_APP_INSTALLATION_ID is not set (secrets/.env)}"
+key=/run/ai-box-secrets/app-private-key.pem
+cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/ai-box"
+cache="$cache_dir/token.json"
+now=$(date +%s)
+
+b64url() { openssl base64 -A | tr '+/' '-_' | tr -d '='; }
+make_jwt() {
+  local header payload sig
+  header=$(printf '{"alg":"RS256","typ":"JWT"}' | b64url)
+  payload=$(printf '{"iat":%d,"exp":%d,"iss":"%s"}' $((now - 60)) $((now + 540)) "$GH_APP_ID" | b64url)
+  sig=$(printf '%s.%s' "$header" "$payload" | openssl dgst -sha256 -sign "$key" | b64url)
+  printf '%s.%s.%s' "$header" "$payload" "$sig"
+}
+
+if [ "${1:-}" = "--jwt" ]; then make_jwt; echo; exit 0; fi
+
+# Reuse the cache only if it is well-formed, belongs to this App and installation, and is not near expiry.
+cached() {
+  [ -f "$cache" ] && jq -er --arg app "$GH_APP_ID" --arg inst "$GH_APP_INSTALLATION_ID" --argjson min $((now + 300)) '
+    select((.token | type) == "string" and (.exp | type) == "number"
+           and .app == $app and .installation == $inst and .exp > $min) | .token' "$cache" 2>/dev/null
+}
+
+umask 077; mkdir -p "$cache_dir"
+exec 9>"$cache_dir/lock"; flock 9
+if token=$(cached); then printf '%s\n' "$token"; exit 0; fi
+
+resp=$(curl -fsS -X POST \
+  -H "Authorization: Bearer $(make_jwt)" -H "Accept: application/vnd.github+json" \
+  "https://api.github.com/app/installations/${GH_APP_INSTALLATION_ID}/access_tokens")
+token=$(jq -er .token <<<"$resp")
+exp=$(date -d "$(jq -er .expires_at <<<"$resp")" +%s)
+tmp=$(mktemp "$cache_dir/token.XXXXXX")
+jq -n --arg t "$token" --argjson e "$exp" --arg app "$GH_APP_ID" --arg inst "$GH_APP_INSTALLATION_ID" \
+  '{token:$t,exp:$e,app:$app,installation:$inst}' > "$tmp"
+mv -f "$tmp" "$cache"
+printf '%s\n' "$token"
