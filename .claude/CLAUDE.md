@@ -78,12 +78,13 @@ foo-skills/
 - Do not stop to ask "may I merge?" after each PR. Stack dependent work on the unmerged branch and list waiting PRs (stacked order and merge order) at a break
 - Enable auto-merge only on PRs whose base is `main`. Approving a stacked PR would merge it into the branch below it. After the PR below merges, retarget the next one to `main`, then enable its auto-merge
 - PRs opened from the host with the owner's credentials cannot be approved by the owner; they merge only through the admin bypass
+- When you ask the owner to decide something, say why you did not decide it yourself (which condition: money, conflict with the philosophy, no judgment axis even after deriving one from intent, missing permission) and on what axis the owner should decide. If you cannot name the condition, decide yourself and proceed
 
 ## Feedback Reflection
 
 When receiving feedback about philosophy, perspectives or skill content:
 
-1. Turn the real failure into an eval case under `evals/` (see `evals/README.md`) and run it on the current sources (`claude plugin eval . --case <name>`). Only real incidents; never invent cases. If the failure cannot be reproduced as a case, say why in the PR
+1. Turn the real failure into an eval case under `evals/` (see `evals/README.md`) and run it on the current sources (`claude plugin eval . --case <name>`). Only real incidents; never invent cases. If the failure cannot be reproduced as a case, say why in the PR. Inside ai-box the AI's shell cannot see Claude's credentials and child `claude` runs fail with `Not logged in`; the owner runs evals from `ai-box shell`
 2. Fix the target file
 3. Run the same case the same number of times and compare. Do not judge from a single run (LLM output varies)
 4. If the feedback is a general rule, update this CLAUDE.md
