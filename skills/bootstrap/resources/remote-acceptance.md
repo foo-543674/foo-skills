@@ -68,8 +68,9 @@ HEAD・base・契約や検証器の版のどれかが変われば再検証する
 
 CODEOWNERS で人間に割り当て、ruleset で code owner の承認を必須にする。CODEOWNERS は base ブランチ側の定義が使われるので、PR 内で書き換えても、その PR の判定は既存の定義で行われる。
 
-- AGENTS.md、レビュー契約、アーキテクチャテスト、git hook、CI の workflow と、そこから呼ばれるスクリプト・設定、`.claude/settings.json`、CODEOWNERS 自身
+- AGENTS.md、レビュー契約、リモート受け入れ契約 (承認なしでマージしてよい変更の条件を含む)、アーキテクチャテスト、git hook、CI の workflow と、そこから呼ばれるスクリプト・設定、`.claude/settings.json`、CODEOWNERS 自身
 - 承認後に push されたら承認を失効させる (承認済みの PR に基準の変更を後から足す経路を塞ぐ)
+- bootstrap の再実行による変更も基準の改訂として、同じ承認を経る
 
 ファイル単位の保護は安全側に倒している。AGENTS.md の現状説明の更新や、アーキテクチャテストの強化にも承認が要るという手間が出るので、その手間を bootstrap-decisions に明記する。緩和だけを意味的に検出する仕組みはまだ持たない。
 
