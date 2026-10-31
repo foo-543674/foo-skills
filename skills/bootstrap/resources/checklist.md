@@ -50,6 +50,7 @@
 - [ ] known-pitfalls.md の該当エントリを確認し、該当する場合は回避策を適用した
 - [ ] ローカルレビューゲートが有効: git hook (pre-commit / pre-push) が決定的ゲートとレビュー記録を確認し、Claude Code PreToolUse hook が `git commit` / `git push` を差し戻す。迂回 (`--no-verify` / `core.hooksPath`) が deny されている (local-review-gate.md)
 - [ ] レビュー契約が生成先の 1 つの原典として具体化され、AGENTS.md・レビュー主体・hook がそこを参照している (プラグインなしで契約全体を参照できる)
+- [ ] レビューの手順が 1 つのレビュースキル (`.agents/skills/code-review/SKILL.md`) にまとまり、Claude Code の code-reviewer・Codex・派生ファイルがそれに従っている。スキルは契約の規則を転記せず参照している
 - [ ] レビューが指摘の台帳で完了を判定している: review-contract.md「生成した仕組みが満たすべきケース」の 5 ケースをゲートが区別する
 - [ ] リモートの AI レビュー workflow を生成していない
 - [ ] リモート受け入れ保証が生成され、マージを止められるかどうか (保護ルールでマージを止める / PR に警告を出すだけ / まだ確かめていない) が実際の資格情報と有効なルールの読み戻しで確かめられ、bootstrap-decisions に記録されている (remote-acceptance.md)
