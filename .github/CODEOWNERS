@@ -1,0 +1,5 @@
+# Every change to this plugin needs the owner's approval: philosophy/ and perspectives/ are the
+# owner's values, skills/ generate and secure other projects (ai-box holds the credential boundary),
+# and .github/ / .claude/ / this file define the checks themselves.
+# Narrow this only when a path is safe to merge without the owner (e.g. after auto-merge criteria exist).
+* @foo-543674
