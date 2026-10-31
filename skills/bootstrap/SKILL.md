@@ -183,6 +183,11 @@ AI コンテキスト基盤が整ったら、技術インフラの構築に進�
 
 **やること**:
 1. 技術インフラの構築 (必要なものだけ):
+   - **開発コマンドの入口** (必須)。philosophy/technology-choices「実行環境」に従い、言語のコマンドはすべてプロジェクトの開発イメージの中で走らせる。AGENTS.md の開発コマンド・git hook・Claude Code hook・CI はこの入口だけを通す (例: `./dev cargo test`)。制約:
+     - `podman` と `docker` のどちらでも動く (オーナーの端末は docker、ai-box の中は rootless Podman の単一 UID モード。ai-box の SKILL「プロジェクトのコマンドを動かす仕組み」)。開発イメージの中 (devcontainer 等) で呼ばれたら直接実行する
+     - 作業ツリーをマウントして実行し、生成物の所有者が呼び出し元のユーザーのままになること
+     - 開発イメージは CI でビルドしてレジストリから取得できるようにする (ai-box の中では `apt-get` のようにユーザーを切り替える Dockerfile をビルドできない)。依存のキャッシュはコンテナの外 (名前付きボリューム等) に置き、毎回の再取得を避ける
+     - 言語ツールが見つからないときに、作業環境へのインストールや直接実行にフォールバックしない。入口の失敗として止める
    - devcontainer (開発環境のコンテナ化)。制約: エディタの devcontainer とローカル実行 (手動 `docker compose`) は **別の Compose プロジェクト** にする。同じプロジェクトに統合すると片方の `down` がもう片方を壊す (逃げ J)。ポートを publish するのは片方だけ。Docker outside of Docker は devcontainer の `features` で入れ、ソケットを手でマウントしない
    - docker-compose (ローカルインフラ)。上記の分離を保ったまま、devcontainer からローカル実行を起動できる構成にする
    - CI パイプライン (lint, test, format, type check, architecture tests)
@@ -195,6 +200,7 @@ AI コンテキスト基盤が整ったら、技術インフラの構築に進�
 3. `.claude/settings.json` の許可コマンドを設定する。判定の問いは「**この操作が確認なしで走ったとき、ユーザーが手作業でやり直す羽目になるものはあるか**」:
    - **allow に入れてよいのは非破壊操作のみ**: 読み取り・調査・検証 (`git status` / `git diff` / `git log`、`ls` / `find` / `rg`、`docker compose ps` / `logs` / `exec`、テスト・lint・型チェック等)
    - **allow に入れない**: コンテナ / インフラのライフサイクル操作 (`docker compose down` / `up` / `restart` / `rm` / `prune`)、履歴・作業ツリーの破壊 (`git push --force` / `git reset --hard` / `git clean` / `git checkout -- .`)、ボリューム・DB・環境の削除。これらは ask に残すか deny にする。`up -d` も対象: devcontainer CLI が起動したコンテナは素の compose ファイルと config hash が一致せず、作り直される (resources/known-pitfalls.md 参照)
+   - 言語のコマンド (`cargo` / `pnpm` / `go` 等) の直接実行は deny し、入口経由 (`./dev ...` 等) だけを allow する。直接実行が許されていると、AI は入口を迂回して作業環境のツールを探す
    - deny は「ホストを汚さない」(パッケージマネージャの直接実行等) だけでなく「**ユーザーの実行環境・セッションを壊さない**」観点でも組む。片方の観点だけが効いている状態にしない
 4. 動作確認: すべてのコマンドが成功することを確認
 

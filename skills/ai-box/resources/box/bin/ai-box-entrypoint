@@ -16,6 +16,11 @@ if [ "$(cat "$HOME/.ai-box-seeded" 2>/dev/null)" != "$seed_version" ] || [ "${AI
   echo "$seed_version" > "$HOME/.ai-box-seeded"
 fi
 
+# Rootless Podman reads storage options only from the user file (podman info: configFile=~/.config/containers/storage.conf,
+# graphOptions empty when they are only in /etc/containers). Home is a volume, so place the box-managed files on every start.
+mkdir -p "$HOME/.config/containers"
+cp -f /etc/ai-box/containers/containers.conf /etc/ai-box/containers/storage.conf "$HOME/.config/containers/"
+
 # Commit as the App's bot user.
 if ! git config --global user.name >/dev/null 2>&1; then
   if slug=$(curl -fsS -H "Authorization: Bearer $(gh-app-token --jwt)" https://api.github.com/app | jq -er .slug) \

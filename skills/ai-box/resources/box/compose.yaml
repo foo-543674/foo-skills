@@ -3,8 +3,13 @@ services:
     build: .
     image: ai-box:latest
     env_file: [secrets/.env]
+    # Default Docker seccomp plus only the namespace / mount syscalls that rootless Podman needs (keyring = false avoids keyctl).
+    # Never seccomp=unconfined, privileged, cap_add SYS_ADMIN or docker.sock: each one reaches the host.
+    # AI_BOX_DIR is exported by the ai-box wrapper so the profile path is absolute.
+    security_opt:
+      - seccomp=${AI_BOX_DIR:?run through the ai-box wrapper}/seccomp.json
     volumes:
-      # Home lives in a named volume: Claude/Codex login, plugins and clones survive rebuilds.
+      # Home lives in a named volume: Claude/Codex login, plugins, clones and Podman images survive rebuilds.
       # Host config dirs are never mounted writable: hooks written there would run on the host
       # with the owner's credentials.
       - ai-home:/home/node

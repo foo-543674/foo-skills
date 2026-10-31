@@ -70,6 +70,7 @@ foo-skills/
 - Exception to "no How": ships a verified implementation (`resources/box/`) as-is, because mistakes that break the credential boundary (agent forwarding, writable config mounts) are silent and the box does not vary by tech stack
 - Keep the invariants in SKILL.md. Before changing `resources/box/`, run `ai-box check` and `resources/setup.md` steps 6-8 on a real machine
 - Never put secrets or owner-specific values in resources
+- Never add language toolchains to the box image. Project commands run in the project's dev image through rootless Podman (single-UID mode, `seccomp.json`). Do not "fix" Podman with `privileged`, `SYS_ADMIN` or `seccomp=unconfined`
 
 ## Working on this repository
 
