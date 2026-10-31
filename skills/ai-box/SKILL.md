@@ -45,7 +45,8 @@ description: Claude Code / Codex を、GitHub に GitHub App (AI 専用の別主
 | 決めたこと | 理由 (観測した事実) |
 |---|---|
 | subuid を割り当てない単一 UID モード (コンテナ内の root = 箱の node) | 通常の rootless Podman は `newuidmap` が uid_map を書く。setuid root の `newuidmap` は名前空間の作成者 (node) と euid が違うため、カーネル (`kernel/user_namespace.c` の `map_write`) が親の名前空間での `CAP_SYS_ADMIN` を要求し、Docker の既定では `write to uid_map failed: Operation not permitted` になる。作成者が自分の uid 1 つだけを割り当てるマッピングは特権なしで書ける (`new_idmap_permitted`) |
-| `seccomp.json` = Docker 標準プロファイル (moby v27.2.0、Apache-2.0) + `clone` `unshare` `setns` `mount` `umount2` `pivot_root` `sethostname` 新マウント API `keyctl` | 標準プロファイルは名前空間作成を `CAP_SYS_ADMIN` 持ちにしか許さず、`unshare` が `Operation not permitted`。`keyctl` がないと crun の `create keyring` が失敗する。`unconfined` は `bpf` `io_uring` `userfaultfd` 等まで開けるので使わない |
+| `seccomp.json` = Docker 標準プロファイル (moby v27.2.0、Apache-2.0) + `clone` `unshare` `setns` `mount` `umount2` `pivot_root` `sethostname` だけ | 標準プロファイルは名前空間作成を `CAP_SYS_ADMIN` 持ちにしか許さず、`unshare` が `Operation not permitted`。新マウント API (`fsopen` 等) は無くても動いた。`unconfined` は `bpf` `io_uring` `userfaultfd` `keyctl` 等まで開けるので使わない |
+| `keyring = false` (コンテナごとの鍵束を作らない) | crun は既定でコンテナごとに鍵束を作り、`keyctl` が要る (無いと `crun: create keyring ...: Operation not permitted`)。`keyring = false` にすると `keyctl` を許可せずに動く (同じプロファイルで既定は失敗、`false` は成功を確認) |
 | ストレージは vfs + `ignore_chown_errors`。設定は `~/.config/containers/` に entrypoint が毎回置く | 単一 UID では他 UID 所有のファイル (debian 系イメージの `/etc/gshadow` は gid 42) を chown できず、イメージの展開が `lchown ... invalid argument` で失敗する。rootless Podman はストレージオプションをユーザー側の設定ファイルからしか読まない (`/etc/containers/storage.conf` に置いたときは `podman info` の `graphOptions` が空で、同じ失敗が起きた) |
 | ネットワークは箱と共有 (`netns = "host"`) | 箱には `/dev/net/tun` がなく、slirp4netns / pasta が使えない |
 

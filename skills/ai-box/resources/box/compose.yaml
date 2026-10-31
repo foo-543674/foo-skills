@@ -3,7 +3,7 @@ services:
     build: .
     image: ai-box:latest
     env_file: [secrets/.env]
-    # Default Docker seccomp plus only the namespace / mount / keyctl syscalls that rootless Podman needs.
+    # Default Docker seccomp plus only the namespace / mount syscalls that rootless Podman needs (keyring = false avoids keyctl).
     # Never seccomp=unconfined, privileged, cap_add SYS_ADMIN or docker.sock: each one reaches the host.
     # AI_BOX_DIR is exported by the ai-box wrapper so the profile path is absolute.
     security_opt:

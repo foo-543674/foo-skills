@@ -837,14 +837,7 @@
         "mount",
         "umount2",
         "pivot_root",
-        "sethostname",
-        "fsopen",
-        "fsconfig",
-        "fsmount",
-        "move_mount",
-        "open_tree",
-        "mount_setattr",
-        "keyctl"
+        "sethostname"
       ],
       "action": "SCMP_ACT_ALLOW"
     }
