@@ -54,7 +54,7 @@ description: Claude Code / Codex を、GitHub に GitHub App (AI 専用の別主
 制約:
 
 - 開発イメージは、root 以外の UID が所有するファイルを含むと正しく展開されないことがある (chown を無視するため)
-- 単一 UID のため、ビルド中にユーザーを切り替える Dockerfile (apt の `_apt` 等) は箱の中でビルドできない可能性がある。プロジェクトの開発イメージは CI でビルドしてレジストリから取得する形を既定にする
+- 単一 UID のため、ビルド中にユーザーを切り替える処理は箱の中で失敗する。`apt-get update` は `_apt` への切り替えで `setgroups ... Operation not permitted` / `seteuid 42 failed` になり、debian 系の Dockerfile はビルドできない (実測)。プロジェクトの開発イメージは CI でビルドしてレジストリから取得する形を既定にする
 - `podman` が出す `no subuid ranges found` と `"/" is not a shared mount` は単一 UID モードの想定どおりの警告
 
 ## 秘密情報の扱い

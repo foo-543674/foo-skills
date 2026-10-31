@@ -19,6 +19,17 @@ bootstrap 中に AI と人間の双方が参照する「既知の CI/Infra 落�
 - **検出方法**: `docker compose ls` で devcontainer と手動起動が同じプロジェクト名に見える。または AI が「検証用コンテナを停止した」と報告した直後にエディタとの接続が切れる
 - **参考**: finance-simulator (foo-skills Issue #58 / #59 / #61)
 
+### 言語のコマンドを作業環境で直接叩く (ai-box で「rust がない」)
+
+- **症状**: ai-box で開発リポジトリを扱うと、AI が `cargo` 等を直接叩いて「コマンドがない」で止まる。AI はそこで箱へのインストールや別の実行方法を探し始める
+- **原因**: 開発コマンドが素のコマンド (`cargo test`) で定義され、「言語ツールは作業環境に入れない」が原料に書かれていなかった。ai-box は docker.sock を持たないので、開発コンテナを起動する手段もなかった
+- **回避策**:
+  - 開発コマンドの入口 (例: `./dev cargo test`) を用意し、AGENTS.md・hook・CI をすべてそこに通す。入口は docker と podman の両方で動かす (bootstrap SKILL Phase 5)
+  - `.claude/settings.json` で言語のコマンドの直接実行を deny する
+  - 開発イメージは CI でビルドしてレジストリから取得する。ai-box の Podman は単一 UID のため、`apt-get` を含む Dockerfile を箱の中でビルドできない (`setgroups ... Operation not permitted`)
+- **検出方法**: AGENTS.md の開発コマンドや git hook に、入口を通らない言語のコマンドがある。ai-box の中で開発コマンドを実行して `command not found` になる
+- **参考**: foo-skills PR #86
+
 ### `anthropics/claude-code-action` + Copilot Coding Agent
 
 - **症状**: Copilot Coding Agent が author の commit を pull_request event で processing するとき、`anthropics/claude-code-action@v1` が 2 段階で連続失敗する
