@@ -174,7 +174,7 @@ AI コンテキスト基盤が整ったら、技術インフラの構築に進�
    - docker-compose (ローカルインフラ)。上記の分離を保ったまま、devcontainer からローカル実行を起動できる構成にする
    - CI パイプライン (lint, test, format, type check, architecture tests)
    - ローカルレビューゲート: git hook (pre-commit / pre-push) で決定的ゲートとレビュー記録の確認を行い、Claude Code の PreToolUse hook (`Bash` の `git commit` / `git push`) で同じ結果を AI に差し戻す。設計は `resources/local-review-gate.md`、指摘の扱いと完了判定は `resources/review-contract.md`。動作確認では review-contract.md「生成した仕組みが満たすべきケース」を通す。迂回経路 (`--no-verify` 等) は permissions の deny で塞ぐ
-   - リモート受け入れ保証: 決定的ゲートの実行確認、レビュー台帳スナップショットの照合、基準ファイルの保護を、PR のコードを実行しない保護された検証経路で行う。設計は `resources/remote-acceptance.md`。レビュー契約と同じく生成先の 1 つの原典 (例: `docs/remote-acceptance.md`) に具体化し、AGENTS.md・レビュー契約・検証処理から参照させる。マージを止められるかどうか (保護ルールでマージを止める / PR に警告を出すだけ / まだ確かめていない) を、実際の資格情報と有効なルールで確かめて記録する
+   - リモート受け入れ保証: 決定的ゲートの実行確認、レビュー台帳スナップショットの照合、基準ファイルの保護を、PR のコードを実行しない保護された検証経路で行う。設計は `resources/remote-acceptance.md`。レビュー契約と同じく生成先の 1 つの原典 (例: `docs/remote-acceptance.md`) に具体化し、AGENTS.md・レビュー契約・検証処理から参照させる。マージを止められるかどうか (保護ルールでマージを止める / PR に警告を出すだけ / まだ確かめていない) を、実際の資格情報と有効なルールで確かめて記録する。人間の承認なしでマージしてよい変更の条件は、AI が `resources/remote-acceptance.md` に沿って初案を起草し、典型的な変更・危険な変更・判断が分かれそうな変更の例でユーザーと任せる範囲を確かめる。合意して有効にするまでは承認なしのマージは行わず、条件の案を判断依頼として残して他の構築を進める (合意を bootstrap の完了の前提にしない)
    - linter/formatter/型チェッカーの設定
    - テストフレームワークの設定とサンプルテスト
    - 設計成果物の構造化フォーマットの選定と雛形 (例: HTTP API → `openapi.yaml`、RDB → `schema.dbml` / `schema.prisma`、受け入れ基準 → Gherkin)。設計文書を `.md` で作る前に、philosophy/development-values の「成果物のフォーマットは構造化を先に検討する」の 3 問を通す。`.contexts/api-design.md` を生成する代わりに `openapi/openapi.yaml` の雛形を生成する、が既定の向き
