@@ -2,7 +2,7 @@
 
 bootstrap が Phase 5 で生成する「commit / push の前にレビューを強制する仕組み」の設計基準。yaml やスクリプトの書き方 (How) ではなく、何をどこで止めるか (What / When) と、なぜその配置か (Why) を置く。
 
-**リモート (GitHub Actions 等) の AI レビュー workflow は生成しない。** チーム開発を前提にしたリモートレビューは別途設計する (保留中)。レビューは開発者の手元で、commit と push の直前に走らせる。
+**リモート (GitHub Actions 等) の AI レビュー workflow は生成しない。** レビューは開発者の手元で、commit と push の直前に走らせる。リモートは再レビューせず、手元で作った台帳が対象の版に対応し契約を満たすかを確かめる (`remote-acceptance.md`)。
 
 ## なぜ手元か
 

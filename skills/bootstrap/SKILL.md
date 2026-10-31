@@ -67,6 +67,7 @@ philosophy/ と perspectives/ を読み込み、このプロジェクトに何�
 3. プロジェクト固有の判断基準・例外を対話で確認する (1 問ずつ、最小限):
    - philosophy の原則のうち、このプロジェクトでは適用しないものはあるか
    - perspectives の基準のうち、このプロジェクトでの重み付けを変えるものはあるか
+   - AI はオーナーとは別の主体 (GitHub App / bot アカウント) で PR を作り、オーナーの資格情報から隔離されるか。リモート受け入れ保証が「境界」になるか「可視化」に留まるかがこれで決まる (`resources/remote-acceptance.md`)
 
 **選定の判断基準**:
 
@@ -164,7 +165,7 @@ AI コンテキスト基盤が整ったら、技術インフラの構築に進�
 
 例外は **失敗がユーザーの作業環境の破壊に直結する領域** (開発コンテナ、ローカル実行環境、permissions)。ここだけは「AI が知識から導出する」に任せず、最小限の制約を原料 (下記の各項目と `resources/known-pitfalls.md`) に残す。導出が間違うと、ユーザーが作業中の環境が落ちて手作業でやり直す羽目になるため。
 
-`${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/resources/known-pitfalls.md` に既知の落とし穴が登録されている。技術インフラ構築時に該当する技術 (Copilot Coding Agent 連携、claude-code-action 等) を扱う場合は該当エントリを参照する。レビューは `resources/local-review-gate.md` の設計基準に従い、commit / push の直前に手元で強制する。**リモート (GitHub Actions 等) の AI レビュー workflow は生成しない** (チーム開発前提のリモートレビューは別途設計、保留中)。
+`${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/resources/known-pitfalls.md` に既知の落とし穴が登録されている。技術インフラ構築時に該当する技術 (Copilot Coding Agent 連携、claude-code-action 等) を扱う場合は該当エントリを参照する。レビューは `resources/local-review-gate.md` の設計基準に従い、commit / push の直前に手元で強制する。**リモート (GitHub Actions 等) の AI レビュー workflow は生成しない**。リモートは再レビューの場ではなく、実装エージェントの権限で変えられない検証経路で受け入れを確かめる場として `resources/remote-acceptance.md` に従って生成する。
 
 **やること**:
 1. 技術インフラの構築 (必要なものだけ):
@@ -172,6 +173,7 @@ AI コンテキスト基盤が整ったら、技術インフラの構築に進�
    - docker-compose (ローカルインフラ)。上記の分離を保ったまま、devcontainer からローカル実行を起動できる構成にする
    - CI パイプライン (lint, test, format, type check, architecture tests)
    - ローカルレビューゲート: git hook (pre-commit / pre-push) で決定的ゲートとレビュー記録の確認を行い、Claude Code の PreToolUse hook (`Bash` の `git commit` / `git push`) で同じ結果を AI に差し戻す。設計は `resources/local-review-gate.md`、指摘の扱いと完了判定は `resources/review-contract.md`。動作確認では review-contract.md「生成した仕組みが満たすべきケース」を通す。迂回経路 (`--no-verify` 等) は permissions の deny で塞ぐ
+   - リモート受け入れ保証: 決定的ゲートの実行確認、レビュー台帳スナップショットの照合、基準ファイルの保護を、PR のコードを実行しない保護された検証経路で行う。設計は `resources/remote-acceptance.md`。レビュー契約と同じく生成先の 1 つの原典 (例: `docs/remote-acceptance.md`) に具体化し、AGENTS.md・レビュー契約・検証処理から参照させる。境界の状態 (境界あり / 可視化のみ / 未確認) を実際の資格情報と有効なルールで確かめて記録する
    - linter/formatter/型チェッカーの設定
    - テストフレームワークの設定とサンプルテスト
    - 設計成果物の構造化フォーマットの選定と雛形 (例: HTTP API → `openapi.yaml`、RDB → `schema.dbml` / `schema.prisma`、受け入れ基準 → Gherkin)。設計文書を `.md` で作る前に、philosophy/development-values の「成果物のフォーマットは構造化を先に検討する」の 3 問を通す。`.contexts/api-design.md` を生成する代わりに `openapi/openapi.yaml` の雛形を生成する、が既定の向き
