@@ -79,6 +79,7 @@ foo-skills/
 - Enable auto-merge only on PRs whose base is `main`. Approving a stacked PR would merge it into the branch below it. After the PR below merges, retarget the next one to `main`, then enable its auto-merge
 - PRs opened from the host with the owner's credentials cannot be approved by the owner; they merge only through the admin bypass
 - When you ask the owner to decide something, say why you did not decide it yourself (which condition: money, conflict with the philosophy, no judgment axis even after deriving one from intent, missing permission) and on what axis the owner should decide. If you cannot name the condition, decide yourself and proceed
+- Round trips with the owner are the bottleneck. Do not drip-feed requests ("do this" → "done" → "now this"). List every owner action and decision up front, say where you resume and what to send back, and if more round trips are unavoidable, say what each one is for and how many you expect. The consult skill is the exception: it digs out the owner's tacit knowledge through the back-and-forth itself
 
 ## Feedback Reflection
 
