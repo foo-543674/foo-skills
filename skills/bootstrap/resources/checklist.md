@@ -24,7 +24,7 @@
 - [ ] .cursorrules が生成された (Cursor 利用者がいる場合、AGENTS.md から派生生成)
 - [ ] 派生生成系ファイルの冒頭に「派生元: AGENTS.md / 再 bootstrap で再同期」を明記している
 - [ ] コミット規約が AGENTS.md に含まれている
-- [ ] AI の判断委任範囲が AGENTS.md に明示されている
+- [ ] AI の判断委任範囲が AGENTS.md に明示されている (人間に判断を求める条件、規約・受け入れ条件・検証器の改訂が通常の作業権限に含まれないこと、改訂権限を委任する範囲を含む)
 - [ ] 設計成果物の役割分担 (canonical 領域 / 実装計画のスコープ / 3 階層の目的) が AGENTS.md に含まれ、技術スタックに合わせて具体化されている
 - [ ] .contexts/bootstrap-decisions.md に判断記録が残されている
 
@@ -46,4 +46,6 @@
 - [ ] .claude/settings.json の allow が非破壊操作のみで構成されている (コンテナのライフサイクル操作・履歴破壊・環境削除は ask / deny)
 - [ ] known-pitfalls.md の該当エントリを確認し、該当する場合は回避策を適用した
 - [ ] ローカルレビューゲートが有効: git hook (pre-commit / pre-push) が決定的ゲートとレビュー記録を確認し、Claude Code PreToolUse hook が `git commit` / `git push` を差し戻す。迂回 (`--no-verify` / `core.hooksPath`) が deny されている (local-review-gate.md)
+- [ ] レビュー契約が生成先の 1 つの原典として具体化され、AGENTS.md・レビュー主体・hook がそこを参照している (プラグインなしで契約全体を参照できる)
+- [ ] レビューが指摘の台帳で完了を判定している: review-contract.md「生成した仕組みが満たすべきケース」の 5 ケースをゲートが区別する
 - [ ] リモートの AI レビュー workflow を生成していない

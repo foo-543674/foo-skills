@@ -99,7 +99,7 @@ philosophy/ と perspectives/ を読み込み、このプロジェクトに何�
      - **設定ファイル・ベンダー固有 DSL・スキーマに踏み込むレビューは、必ず該当する公式ドキュメントまたはスキーマを参照してから指摘する**。推測でモノを言わない (対象例: Claude Code permission DSL, OpenAPI スキーマ, Cargo.toml, package.json, terraform プロバイダ DSL 等)
      - レビュー間で指摘内容が矛盾する場合、その原因はほぼ常に「最初に仕様を確認していない」ことなので、確認を経てから指摘する
      - 仕様を確認せず推測で述べる場合は「未確認だが」と明示する
-   - この code-reviewer は Phase 5 のローカルレビューゲート (`resources/local-review-gate.md`) から呼ばれる主体でもある。レビュー結果の冒頭に非決定性のメタ注記を出し、対象 diff のハッシュと判定 (Critical / Important / Minor の件数) をレビュー記録として残す動作を含める
+   - この code-reviewer は Phase 5 のローカルレビューゲート (`resources/local-review-gate.md`) から呼ばれる主体でもある。レビュー結果の冒頭に非決定性のメタ注記を出し、指摘を `resources/review-contract.md` の台帳 (ID・根拠・状態・処置の根拠・由来) として対象 diff のハッシュ付きで記録する動作を含める。完了は件数ではなく台帳の状態で判定し、再実行で出なかった指摘を解消扱いにしない。契約は生成先の 1 つの原典 (例: `docs/review-contract.md`) として具体化し、code-reviewer・AGENTS.md・hook はそこを参照する
 5. **自然言語の使用範囲を AGENTS.md に埋め込む**:
    - ドキュメント / ローカライズファイルはプロジェクトの公用語可、ソースコード・コメント・識別子・コミットメッセージは英語のみ、という境界を明文化する
    - bootstrap 時にプロジェクトの公用語を確認し、`resources/context-template.md` をもとに生成する **AGENTS.md の表** をプロジェクトに合わせて調整する (テンプレート自体は変更しない)
@@ -171,7 +171,7 @@ AI コンテキスト基盤が整ったら、技術インフラの構築に進�
    - devcontainer (開発環境のコンテナ化)。制約: エディタの devcontainer とローカル実行 (手動 `docker compose`) は **別の Compose プロジェクト** にする。同じプロジェクトに統合すると片方の `down` がもう片方を壊す (逃げ J)。ポートを publish するのは片方だけ。Docker outside of Docker は devcontainer の `features` で入れ、ソケットを手でマウントしない
    - docker-compose (ローカルインフラ)。上記の分離を保ったまま、devcontainer からローカル実行を起動できる構成にする
    - CI パイプライン (lint, test, format, type check, architecture tests)
-   - ローカルレビューゲート: git hook (pre-commit / pre-push) で決定的ゲートとレビュー記録の確認を行い、Claude Code の PreToolUse hook (`Bash` の `git commit` / `git push`) で同じ結果を AI に差し戻す。設計は `resources/local-review-gate.md`。迂回経路 (`--no-verify` 等) は permissions の deny で塞ぐ
+   - ローカルレビューゲート: git hook (pre-commit / pre-push) で決定的ゲートとレビュー記録の確認を行い、Claude Code の PreToolUse hook (`Bash` の `git commit` / `git push`) で同じ結果を AI に差し戻す。設計は `resources/local-review-gate.md`、指摘の扱いと完了判定は `resources/review-contract.md`。動作確認では review-contract.md「生成した仕組みが満たすべきケース」を通す。迂回経路 (`--no-verify` 等) は permissions の deny で塞ぐ
    - linter/formatter/型チェッカーの設定
    - テストフレームワークの設定とサンプルテスト
    - 設計成果物の構造化フォーマットの選定と雛形 (例: HTTP API → `openapi.yaml`、RDB → `schema.dbml` / `schema.prisma`、受け入れ基準 → Gherkin)。設計文書を `.md` で作る前に、philosophy/development-values の「成果物のフォーマットは構造化を先に検討する」の 3 問を通す。`.contexts/api-design.md` を生成する代わりに `openapi/openapi.yaml` の雛形を生成する、が既定の向き
