@@ -82,6 +82,7 @@ ai-box check; echo "exit=$?"
 
 - `repositories` に出るのは、App をインストールしたリポジトリ (ここでは `<owner>/ai-box-sandbox`) だけ
 - `bot identity` は `<slug>[bot] <数字+<slug>[bot]@users.noreply.github.com>`
+- `project containers` の 3 行がすべて `ok:` (箱に `CAP_SYS_ADMIN` がなく、seccomp が効いたまま、Podman が名前空間を作れる)
 
 ## 7. 実際に bot として PR を作れるか
 
@@ -102,6 +103,18 @@ exit
 
 PR のページで、作成者とコミットの author が `<slug>[bot]` になっていることを確認する。
 
+続けて、プロジェクトのコマンドが開発イメージの中で動くこと (箱に言語ツールが入っていないこと) を確かめる:
+
+```bash
+ai-box shell
+which cargo || echo "no cargo in the box"       # 箱には入っていないこと
+mkdir -p ~/work/podman-smoke && cd ~/work/podman-smoke
+podman run --rm -v "$PWD":/work -w /work docker.io/library/rust:1-slim \
+  sh -c "cargo new --quiet hello && cd hello && cargo run --quiet"   # Hello, world!
+ls -ln hello                                     # 所有者が 1000 (箱の node)
+cd && rm -rf ~/work/podman-smoke && exit
+```
+
 ## 8. Claude Code とプラグイン
 
 ```bash
@@ -115,5 +128,6 @@ ai-box claude <owner>/ai-box-sandbox
 次を Claude に貼る (トークンや鍵は含まれない):
 
 - `ai-box check` の出力
+- 手順 7 の Podman で `Hello, world!` が出たか
 - 手順 7 の PR の URL と、設定変更が 403 (Resource not accessible by integration) だったか
 - 手順 8 でログイン不要だったか、プラグインが入っていたか

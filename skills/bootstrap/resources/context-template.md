@@ -93,7 +93,7 @@ push 前に最低限通すべき検証。タスクが複数種別にまたがる
 | OpenAPI / スキーマ変更 | スキーマ lint + 参照元ドキュメント・実装との整合確認 |
 | DB マイグレーション変更 | マイグレーション適用 + ORM スキーマ再生成 + 既存テストの再実行 |
 
-[プロジェクトの技術スタックに応じて上記表を具体化する。例: backend = `cargo fmt + cargo clippy + cargo nextest + cargo test --test arch`, frontend = `pnpm format + pnpm lint + pnpm typecheck + pnpm test + pnpm arch:test`, OpenAPI = `redocly lint`, migration = `db-migrate(-test) + db-prepare`]
+[プロジェクトの技術スタックに応じて上記表を具体化する。すべて開発コマンドの入口を通す。例: backend = `./dev cargo fmt + ./dev cargo clippy + ./dev cargo nextest + ./dev cargo test --test arch`, frontend = `./dev pnpm format + ./dev pnpm lint + ./dev pnpm typecheck + ./dev pnpm test + ./dev pnpm arch:test`, OpenAPI = `./dev redocly lint`, migration = `./dev db-migrate(-test) + ./dev db-prepare`]
 
 ### レビューゲート (commit / push は hook で止まる)
 
@@ -270,6 +270,8 @@ settings.json で許可されている読み取り系・調査系コマンドは
 ## 開発コマンド
 
 [Phase 5 で実際のコマンドを埋める]
+
+言語のコマンドは作業環境 (ホスト・AI の実行環境) に入っていない。すべて [開発コマンドの入口 (例: `./dev`)] を通して開発イメージの中で実行する。`cargo` 等が見つからなくても、インストールや直接実行で回避しない。入口が失敗するならその原因を直す。
 
 | 操作 | コマンド |
 |---|---|

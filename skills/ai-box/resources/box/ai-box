@@ -2,6 +2,7 @@
 # ai-box: run Claude Code / Codex in a container that can reach GitHub only as the GitHub App.
 set -euo pipefail
 here="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+export AI_BOX_DIR="$here"
 compose() { docker compose -f "$here/compose.yaml" "$@"; }
 
 usage() {
@@ -71,6 +72,12 @@ case "$cmd" in
       [ ! -e /var/run/docker.sock ]          && ok "no docker.sock"     || ng "docker.sock is mounted"
       env | grep -qE "^(GH_TOKEN|GITHUB_TOKEN|GH_ENTERPRISE_TOKEN)=" && ng "a GitHub token is set in the environment" || ok "no GitHub token in the environment"
       grep -qiE "token|secret|password|authorization" "$HOME/.claude/settings.json" 2>/dev/null && ng "~/.claude/settings.json mentions credentials" || ok "seeded settings carry no credential keys"
+      echo "== project containers (rootless Podman, no host access)"
+      capbnd=$(awk "/^CapBnd/{print \$2}" /proc/self/status)
+      (( (16#$capbnd >> 21) & 1 )) && ng "CAP_SYS_ADMIN is in the bounding set (cap_add / privileged?)" || ok "no CAP_SYS_ADMIN"
+      [ "$(awk "/^Seccomp:/{print \$2}" /proc/self/status)" = 2 ] && ok "seccomp filter active" || ng "seccomp is not filtering (unconfined?)"
+      podman unshare true >/dev/null 2>&1 && ok "podman can create a user namespace" || ng "podman unshare failed (seccomp profile not applied?)"
+
       echo "== Claude / Codex"
       claude --version >/dev/null 2>&1 && ok "claude $(claude --version)" || ng "claude not runnable"
       codex login status >/dev/null 2>&1 && ok "codex logged in" || ng "codex is not logged in (ai-box codex-login)"

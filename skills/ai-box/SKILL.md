@@ -31,8 +31,31 @@ description: Claude Code / Codex を、GitHub に GitHub App (AI 専用の別主
 - ai-box の置き場所 (と、それを管理するリポジトリがあればそれ) に App をインストールしない。AI が自分の箱を書き換えられる
 - AI が作業するリポジトリはコンテナ内で App の権限で clone する。オーナーとのやり取りは PR だけ
 - 秘密鍵・トークンは `~/ai-box/secrets/` (権限 700 / 600) に置き、どのリポジトリにも Docker のビルドコンテキストにも入れない (`.dockerignore`)
+- 言語のツールチェーン (cargo / node のパッケージ / go 等) を箱のイメージに入れない。プロジェクトのコマンドは箱の中の rootless Podman で、プロジェクトの開発イメージの中で動かす (下記)
+- 箱のコンテナに `privileged`・`cap_add: SYS_ADMIN`・`seccomp=unconfined` を付けない。Podman のために緩めるのは `seccomp.json` に足したシステムコールだけ
 
 箱の中の AI が、読める鍵やトークンを意図的にリポジトリや外部へ持ち出すことは、この構成では機構的に防げない。被害は App の権限とインストール先の範囲に限られ、鍵を失効すれば止められる。`ai-box check` が確かめるのは、表示している場所にオーナーの資格情報がないことまでで、それ以外の場所に無いことは保証しない。
+
+## プロジェクトのコマンドを動かす仕組み
+
+箱の中にはプロジェクトの言語ツールがない。AI は `cargo test` 等を直接叩かず、プロジェクトが用意した入口 (bootstrap Phase 5 の「開発コマンドの入口」) を通して、開発イメージの中で動かす。入口が `podman` を見つければ箱の中の Podman で、オーナーの端末では `docker` で動く。
+
+箱の中の Podman は次の形で動かす。いずれも実機 (Docker 27.2.0 / WSL2 カーネル 6.18) で確かめた結果に基づく。
+
+| 決めたこと | 理由 (観測した事実) |
+|---|---|
+| subuid を割り当てない単一 UID モード (コンテナ内の root = 箱の node) | 通常の rootless Podman は `newuidmap` が uid_map を書く。setuid root の `newuidmap` は名前空間の作成者 (node) と euid が違うため、カーネル (`kernel/user_namespace.c` の `map_write`) が親の名前空間での `CAP_SYS_ADMIN` を要求し、Docker の既定では `write to uid_map failed: Operation not permitted` になる。作成者が自分の uid 1 つだけを割り当てるマッピングは特権なしで書ける (`new_idmap_permitted`) |
+| `seccomp.json` = Docker 標準プロファイル (moby v27.2.0、Apache-2.0) + `clone` `unshare` `setns` `mount` `umount2` `pivot_root` `sethostname` 新マウント API `keyctl` | 標準プロファイルは名前空間作成を `CAP_SYS_ADMIN` 持ちにしか許さず、`unshare` が `Operation not permitted`。`keyctl` がないと crun の `create keyring` が失敗する。`unconfined` は `bpf` `io_uring` `userfaultfd` 等まで開けるので使わない |
+| ストレージは vfs + `ignore_chown_errors` | 単一 UID では他 UID 所有のファイルを chown できない |
+| ネットワークは箱と共有 (`netns = "host"`) | 箱には `/dev/net/tun` がなく、slirp4netns / pasta が使えない |
+
+この構成で、AI が届くのは箱の中のファイルと箱のネットワークまで。ホストの Docker API には届かない。箱から出るにはカーネルの脆弱性が要るが、名前空間とマウントのシステムコールを開けた分、その攻撃面は既定の Docker より広い。
+
+制約:
+
+- 開発イメージは、root 以外の UID が所有するファイルを含むと正しく展開されないことがある (chown を無視するため)
+- 単一 UID のため、ビルド中にユーザーを切り替える Dockerfile (apt の `_apt` 等) は箱の中でビルドできない可能性がある。プロジェクトの開発イメージは CI でビルドしてレジストリから取得する形を既定にする
+- `podman` が出す `no subuid ranges found` と `"/" is not a shared mount` は単一 UID モードの想定どおりの警告
 
 ## 秘密情報の扱い
 
