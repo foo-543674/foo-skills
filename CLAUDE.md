@@ -44,7 +44,7 @@ architecture, api-design, data-modeling, component, disposability, testing, erro
 
 ### skills/ai-box — AI の実行環境を端末側で分離する
 
-`/foo-skills:ai-box` で起動。Claude Code / Codex を、GitHub に権限を絞った GitHub App としてしか触れないコンテナで動かす環境 `~/ai-box/` を構築する。オーナーの認証から AI を切り離し、bootstrap が生成するリモート受け入れ保証を境界として成立させる前提を作る。
+`/foo-skills:ai-box` で起動。Claude Code / Codex を、GitHub に権限を絞った GitHub App としてしか触れないコンテナで動かす環境 `~/ai-box/` を構築する。オーナーの認証から AI を切り離し、bootstrap が生成するリモートの受け入れ判定で AI のマージを止められるようにする前提を作る。
 
 ## 使い方
 

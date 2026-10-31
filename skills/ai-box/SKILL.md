@@ -9,13 +9,13 @@ description: Claude Code / Codex を、GitHub に GitHub App (AI 専用の別主
 
 ## Why: なぜ必要か
 
-リモートの受け入れ保証が境界になるかは、置き場所ではなく AI の資格情報で決まる (`bootstrap/resources/remote-acceptance.md`「境界は場所ではなく資格情報で決まる」)。AI がオーナーと同じ OS ユーザーで動いていれば、ruleset も CODEOWNERS も AI が迂回・承認できる。ai-box はその前提を端末の側で作る。
+リモートの受け入れ判定で AI のマージを止められるかは、置き場所ではなく AI の資格情報で決まる (`bootstrap/resources/remote-acceptance.md`)。AI がオーナーと同じ OS ユーザーで動いていれば、AI はオーナーの認証を使って ruleset を外したり、CODEOWNERS の承認をしたりできる。ai-box はその前提を端末の側で作る。
 
 ## このスキルが How を持つ理由
 
 このプラグインは原則として How を置かない。ai-box は例外で、検証済みの実装 (`resources/box/`) をそのまま配る。
 
-- 境界を崩す誤り (ssh-agent の転送、設定ディレクトリの書き込み可能なマウント等) は、導出を少し間違えるだけで静かに入り、動作には現れない
+- AI にオーナーの認証を渡してしまう誤り (ssh-agent の転送、設定ディレクトリの書き込み可能なマウント等) は、導出を少し間違えるだけで静かに入り、動作には現れない
 - 技術スタックで形が変わらないので、毎回導出させる利点がない
 
 実装を変えるときは、下の「破ってはいけない条件」を保ち、`ai-box check` と `resources/setup.md` の手順 6〜8 を通してから反映する。
@@ -64,12 +64,12 @@ description: Claude Code / Codex を、GitHub に GitHub App (AI 専用の別主
 
 ユーザーが手順 6 (`ai-box seed` / `ai-box codex-login`) を済ませたら、`ai-box check` を実行する。必須の検査が 1 つでも失敗すれば非 0 で終わるので、終了コードで判定する。続けて手順 7 (bot として PR を作れること、管理者の操作が `403 Resource not accessible by integration` になること) と手順 8 (Claude Code がログインなしで起動し、プラグインが入っていること) を確かめる。
 
-### 5. 境界の状態を伝える
+### 5. マージを止められるかどうかを伝える
 
-ai-box ができても、それだけでマージを止められるとは限らない。対象リポジトリごとに次を伝える。
+ai-box ができても、それだけで AI のマージを止められるとは限らない。対象リポジトリごとに次を伝える。
 
-- ruleset・ブランチ保護が使えるか。GitHub Free の private リポジトリでは使えず、App の権限を絞っても base への直接 push や自分の PR のマージを止められない (`remote-acceptance.md`「可視化のみ」)
-- 境界にするための選択肢 (プランの変更、公開範囲の変更) と、その判断はユーザーのものであること
+- ruleset・ブランチ保護が使えるか。GitHub Free の private リポジトリでは使えず、App の権限を絞っても base への直接 push や自分の PR のマージを止められない。その場合は PR に警告を出して後から気づけるようにするだけになる (`remote-acceptance.md`)
+- マージを止めるための選択肢 (プランの変更、公開範囲の変更、組織のリポジトリを使う) と、その判断はユーザーのものであること。個人の private リポジトリなど、警告だけで足りる場合も多い
 
 ## 別の端末で使う・端末を移る
 
