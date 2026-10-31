@@ -16,7 +16,7 @@
 プロジェクトの中 (生成物)
   AGENTS.md (原典), CLAUDE.md / GEMINI.md (@AGENTS.md import)
   .github/copilot-instructions.md, .cursorrules (AGENTS.md から派生生成)
-  code-reviewer エージェント
+  レビュースキル (.agents/skills/code-review) と code-reviewer エージェント
   アーキテクチャテスト
   コミット規約、開発コマンド
 ```

@@ -30,7 +30,7 @@ git hook が本体で、Claude Code hook はその結果を AI に説明する�
 
 ## レビュー記録
 
-- レビューは `.claude/agents/code-reviewer.md` (Phase 3 で生成) が行い、`review-contract.md` の **指摘の台帳** に記録する。各レビュー回には対象 diff のハッシュと実行時刻を付ける。台帳はリポジトリ外 (例: `.git/` 配下) に置き、追跡対象にしない
+- レビューは生成先のレビュースキル (`.agents/skills/code-review/SKILL.md`、Phase 3 で生成) に従って、実装とは別のコンテキストで行う (Claude Code なら `.claude/agents/code-reviewer.md`、Codex なら別セッション)。`review-contract.md` の **指摘の台帳** に記録する。各レビュー回には対象 diff のハッシュと実行時刻を付ける。台帳はリポジトリ外 (例: `.git/` 配下) に置き、追跡対象にしない
 - hook は「現在の diff をレビューした回が台帳にあり、`review-contract.md`「完了の判定」を満たすか」を見る。ただし判断依頼を積んだエスカレーション中の指摘では止めない (`review-contract.md`「作業の継続と受け入れ」)。人間の判断待ちで作業を止めず、受け入れの判定 (リモート受け入れ・マージ) で止める。件数ではなく指摘ごとの状態で判定する。**記録が無い = レビューしていない = 止める**。「指摘なし」と「レビュー未実施」を外形で区別できる形にする
 - diff が変わればレビューし直す (修正後に再レビューせず commit する経路を塞ぐ)。台帳は diff をまたいで引き継ぎ、再レビューは既存の指摘の解消確認から始める
 - 重大度ごとの通過条件は `review-contract.md`「完了の判定」に従う。ここには転記しない。台帳は追跡されないため、Important を却下・保留したときはコミットメッセージ本文にも理由を残す
@@ -53,4 +53,4 @@ hook は迂回できてしまうので、迂回経路を機構と規約の両方
 
 - git hook の管理方法 (lefthook / husky / pre-commit / 言語標準の仕組み) は技術スタックから AI が選ぶ。条件は「clone 直後に追加 install なしで有効になる」こと (Phase 5 受け入れ基準「書ける」「止まる」)
 - 所要時間: pre-commit は秒〜1 分、pre-push は数分以内を目安にする。超えるなら決定的ゲートの分割 (staged 分だけ / 変更範囲だけ) を先に検討し、AI レビューの省略を検討しない
-- 他の AI ツール (Copilot / Cursor / Gemini CLI) 向けには、派生生成する指示ファイルに「hook に止められたら code-reviewer 相当のレビューを行い、記録を残してから再実行する」を含める。Claude Code hook が無くても git hook が止めるので、規約は同じ
+- 他の AI ツール (Copilot / Cursor / Gemini CLI) 向けには、派生生成する指示ファイルに「hook に止められたら、実装した会話とは別のコンテキストのレビュー主体に、レビュースキル (`.agents/skills/code-review/SKILL.md`) に従ってレビューさせ、記録を残してから再実行する。別のコンテキストを使えなければ、レビューは未実施として扱う」を含める。Claude Code hook が無くても git hook が止めるので、規約は同じ

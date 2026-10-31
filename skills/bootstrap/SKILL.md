@@ -22,10 +22,13 @@ target-project/
 ├── AGENTS.md                         # プロジェクト指示の単一原典 (Codex CLI / その他 AGENTS.md 対応ツール)
 ├── CLAUDE.md                         # Claude Code 用 (`@AGENTS.md` で AGENTS.md を import)
 ├── GEMINI.md                         # Gemini CLI 用 (`@AGENTS.md` で AGENTS.md を import)
+├── .agents/
+│   └── skills/
+│       └── code-review/SKILL.md      # レビュー手順の原典 (Agent Skills 形式。Codex 等が読み込む)
 ├── .claude/
 │   ├── settings.json                 # 許可コマンド、フック設定
 │   └── agents/                       # プロジェクト固有エージェント (必要なら)
-│       └── code-reviewer.md
+│       └── code-reviewer.md          # 別コンテキストで code-review スキルに従うだけの薄い定義
 │
 ├── .github/
 │   └── copilot-instructions.md       # Copilot 用 (AGENTS.md からの派生生成 — import 構文がないため)
@@ -93,14 +96,16 @@ philosophy/ と perspectives/ を読み込み、このプロジェクトに何�
    - `.github/copilot-instructions.md` — AGENTS.md の核心部分を Copilot 形式に変換
    - `.cursorrules` — AGENTS.md の核心部分を Cursor 形式に変換
    - 派生元 (AGENTS.md) を冒頭にコメントで明記する。更新するときは現在の AGENTS.md から更新案を作り、ツール固有の追記や手で加えた編集を消さないか確かめる (無条件に作り直さない)
-4. **code-reviewer エージェントを生成する** (必要な場合):
-   - 選定した perspectives をレビュー観点として組み込んだプロジェクト固有の code-reviewer
-   - `.claude/agents/code-reviewer.md` に配置
-   - 生成する code-reviewer.md には以下の動作原則を必ず明記する:
+4. **レビュースキルと code-reviewer エージェントを生成する** (必要な場合):
+   - レビューの手順はツールごとに持たず、Agent Skills 形式の 1 つのスキル `.agents/skills/code-review/SKILL.md` を原典にする。Codex はこの場所のスキルを読み込む。Claude Code は `.agents/skills/` を自動では読み込まないので、`.claude/agents/code-reviewer.md` は「最初にリポジトリルートの `.agents/skills/code-review/SKILL.md` を読み、それに従う」とだけ書いた薄い定義にする (サブエージェントなので別のコンテキストで動く)。Copilot / Cursor / Gemini CLI 向けの派生ファイルからも、このスキルを参照させる
+   - 判定の規則 (台帳・完了の判定・独立性) はレビュー契約 (例: `docs/review-contract.md`) が原典で、スキルには転記せず参照させる。スキルが持つのは、何を入力として受け取り、どう見て、どう記録するかの手順
+   - 選定した perspectives をレビュー観点としてスキルに組み込む
+   - レビューする側は、実装した会話とは別のコンテキストで動かす (Claude Code ならサブエージェント、Codex なら別セッション)。複数のレビュー主体の結果をどうまとめるかは、レビュー契約の「独立性」に従う
+   - 生成するスキルには以下の動作原則を必ず明記する:
      - **設定ファイル・ベンダー固有 DSL・スキーマに踏み込むレビューは、必ず該当する公式ドキュメントまたはスキーマを参照してから指摘する**。推測でモノを言わない (対象例: Claude Code permission DSL, OpenAPI スキーマ, Cargo.toml, package.json, terraform プロバイダ DSL 等)
      - レビュー間で指摘内容が矛盾する場合、その原因はほぼ常に「最初に仕様を確認していない」ことなので、確認を経てから指摘する
      - 仕様を確認せず推測で述べる場合は「未確認だが」と明示する
-   - この code-reviewer は Phase 5 のローカルレビューゲート (`resources/local-review-gate.md`) から呼ばれる主体でもある。レビュー結果の冒頭に非決定性のメタ注記を出し、指摘を `resources/review-contract.md` の台帳 (ID・根拠・状態・処置の根拠・由来) として対象 diff のハッシュ付きで記録する動作を含める。完了は件数ではなく台帳の状態で判定し、再実行で出なかった指摘を解消扱いにしない。契約は生成先の 1 つの原典 (例: `docs/review-contract.md`) として具体化し、code-reviewer・AGENTS.md・hook はそこを参照する
+   - このスキル (と、それに従う code-reviewer・Codex) は Phase 5 のローカルレビューゲート (`resources/local-review-gate.md`) から呼ばれる主体でもある。レビュー結果の冒頭に非決定性のメタ注記を出し、指摘を `resources/review-contract.md` の台帳 (ID・根拠・状態・処置の根拠・由来) として対象 diff のハッシュ付きで記録する動作を含める。完了は件数ではなく台帳の状態で判定し、再実行で出なかった指摘を解消扱いにしない。契約は生成先の 1 つの原典 (例: `docs/review-contract.md`) として具体化し、レビュースキル・AGENTS.md・hook はそこを参照する
 5. **自然言語の使用範囲を AGENTS.md に埋め込む**:
    - ドキュメント / ローカライズファイルはプロジェクトの公用語可、ソースコード・コメント・識別子・コミットメッセージは英語のみ、という境界を明文化する
    - bootstrap 時にプロジェクトの公用語を確認し、`resources/context-template.md` をもとに生成する **AGENTS.md の表** をプロジェクトに合わせて調整する (テンプレート自体は変更しない)
