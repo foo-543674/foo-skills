@@ -67,7 +67,7 @@ philosophy/ と perspectives/ を読み込み、このプロジェクトに何�
 3. プロジェクト固有の判断基準・例外を対話で確認する (1 問ずつ、最小限):
    - philosophy の原則のうち、このプロジェクトでは適用しないものはあるか
    - perspectives の基準のうち、このプロジェクトでの重み付けを変えるものはあるか
-   - AI はオーナーとは別の主体 (GitHub App / bot アカウント) で PR を作り、オーナーの資格情報から隔離されるか。AI のマージを GitHub の保護ルールで止められるか、PR に警告を出すだけになるかがこれで決まる (`resources/remote-acceptance.md`)
+   - AI はオーナーとは別の主体 (GitHub App / bot アカウント) で PR を作り、オーナーの資格情報から隔離されるか。AI のマージを GitHub の保護ルールで止められるか、PR に警告を出すだけになるかがこれで決まる (`resources/remote-acceptance.md`)。別主体の実行環境が未整備なら `/foo-skills:ai-box` で端末に用意できることを伝える。個人の private リポジトリなど、警告だけで足りる場合は無理に勧めない
 
 **選定の判断基準**:
 
