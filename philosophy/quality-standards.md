@@ -45,6 +45,7 @@ Layer 1: CLAUDE.md (ガイダンス)
 Layer 2: Architecture Tests (ガードレール)
   ルール違反を CI で自動検出する
   → 破れない (CI が壊れて止まる)
+  → ただし AI の資格情報で検証器・保護設定を変えられないときに限る
   → AI 自身が「壊れた → 直す」のループを回せる
 
 Layer 3: Code Review Agent (評価)
