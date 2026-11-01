@@ -188,6 +188,7 @@ AI コンテキスト基盤が整ったら、技術インフラの構築に進�
      - 作業ツリーをマウントして実行し、生成物の所有者が呼び出し元のユーザーのままになること
      - 開発イメージは CI でビルドしてレジストリから取得できるようにする (ai-box の中では `apt-get` のようにユーザーを切り替える Dockerfile をビルドできない)。依存のキャッシュはコンテナの外 (名前付きボリューム等) に置き、毎回の再取得を避ける
      - 言語ツールが見つからないときに、作業環境へのインストールや直接実行にフォールバックしない。入口の失敗として止める
+     - **タスクランナーと手順書も入口を通す**: Makefile・justfile・`package.json` の scripts から言語のコマンドを呼ぶもの・README のセットアップ手順・devcontainer の `postCreateCommand` 等、言語のコマンドを書くすべての場所が対象。既存のものも書き換える。settings.json の deny (`cargo:*` 等) はタスクランナーの中で走るコマンドを捕まえないので、deny で守った気にならない。生成後に、これらのファイルの中で言語のコマンドが入口を通らずに書かれていないかを全件検索して確かめる
    - devcontainer (開発環境のコンテナ化)。制約: エディタの devcontainer とローカル実行 (手動 `docker compose`) は **別の Compose プロジェクト** にする。同じプロジェクトに統合すると片方の `down` がもう片方を壊す (逃げ J)。ポートを publish するのは片方だけ。Docker outside of Docker は devcontainer の `features` で入れ、ソケットを手でマウントしない
    - docker-compose (ローカルインフラ)。上記の分離を保ったまま、devcontainer からローカル実行を起動できる構成にする
    - CI パイプライン (lint, test, format, type check, architecture tests)
