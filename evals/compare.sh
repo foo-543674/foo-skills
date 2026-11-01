@@ -6,13 +6,17 @@
 #   <ref>  the change to evaluate (a branch, e.g. origin/feedback/foo).
 #          Omitted: the current working tree, uncommitted edits included.
 #
+# From the host, in one line (no checkout needed; the script is read from main):
+#   ai-box shell foo-543674/foo-skills -c 'git fetch -q origin && git show origin/main:evals/compare.sh | bash -s -- -c "bootstrap-*" origin/<branch>'
+#
 # "Before" is the sources at the merge base of <ref> and origin/main, graded
 # with the eval cases of <ref>, so both arms are judged by the same cases.
-# Temporary worktrees are removed on exit; reports stay in
-# evals/results/compare-<timestamp>/ (git-ignored).
+# Prints a per-case before / after table and the failed criteria of the
+# after arm. Temporary worktrees are removed on exit; the JSON, HTML reports
+# and the summary stay in evals/results/compare-<timestamp>/ (git-ignored).
 set -euo pipefail
 
-usage() { sed -n '4,8p' "$0" | sed 's/^# \{0,1\}//'; exit 2; }
+usage() { echo 'usage: evals/compare.sh [-c <case glob>] [-n <runs>] [<ref>]' >&2; exit 2; }
 
 case_glob='*'
 runs=3
@@ -76,7 +80,30 @@ run_arm() {
 run_arm before "$before"
 run_arm after "$after"
 
+# Per-case pass rate (runs that met every criterion) and mean score, then the
+# criteria the after arm failed with the judge's explanation.
+summarize() {
+  jq -r -n --slurpfile b "$out/before.json" --slurpfile a "$out/after.json" '
+    def pad($w): . + (" " * ([$w - length, 1] | max));
+    def rate: if . == null then "-" else "\(.aggregates.passRate * 100 | round)% (score \(.aggregates.score * 100 | round / 100))" end;
+    def byname(f): f[0].cases | map({key: .name, value: .}) | from_entries;
+    (byname($b)) as $bc | (byname($a)) as $ac
+    | ([$ac | keys[] | length] + [4] | max + 2) as $w
+    | ("case" | pad($w)) + ("before" | pad(24)) + "after",
+      ($ac | keys[] as $k | ($k | pad($w)) + ($bc[$k] | rate | pad(24)) + ($ac[$k] | rate)),
+      "",
+      "failed in after:",
+      ([$a[0].cases[] | .name as $n | .arms.with | to_entries[] | .key as $i
+        | (if .value.error then "  \($n) run \($i + 1): error: \(.value.error)" else empty end),
+          (.value.graders[] | select(.passed | not)
+            | "  \($n) run \($i + 1): \(.name): \(.explanation | gsub("\\s+"; " ") | .[0:300])")]
+       | if length == 0 then "  (none)" else .[] end)
+  '
+  echo
+  echo "before: sources at $(git -C "$repo" rev-parse --short "$base") (merge base with origin/main), cases of ${ref:-working tree}"
+  echo "after:  ${ref:-working tree}"
+  echo "files:  $out/"
+}
+
 echo
-echo "before: sources at $(git -C "$repo" rev-parse --short "$base") (merge base with origin/main)"
-echo "after:  ${ref:-working tree}"
-echo "reports: $out/before.html, $out/after.html"
+summarize | tee "$out/summary.txt"
