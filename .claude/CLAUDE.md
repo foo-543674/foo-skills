@@ -75,8 +75,10 @@ foo-skills/
 ## Working on this repository
 
 - Develop from ai-box (`ai-box claude foo-543674/foo-skills`) so that PRs are opened by the GitHub App, not the owner. The ruleset requires the owner's approval; auto-merge is enabled, so an approved PR merges without further interaction
-- Do not stop to ask "may I merge?" after each PR. Stack dependent work on the unmerged branch and list waiting PRs (stacked order and merge order) at a break
-- Enable auto-merge only on PRs whose base is `main`. Approving a stacked PR would merge it into the branch below it. After the PR below merges, retarget the next one to `main`, then enable its auto-merge
+- Do not stop to ask "may I merge?" after each PR. List waiting PRs at a break
+- Branch every PR from `main` and do not stack PRs. A stacked PR shows the changes below it and makes the owner track merge order. If the next work depends on an unmerged PR, do independent work first, or keep the dependent work on a local branch and open its PR from `main` after the dependency merges
+- Ask the owner to approve only PRs that can be judged now: all checks on the current HEAD green, and the part that needs the owner's eyes named. Do not hand over conditional requests ("approve after #xx merges", "approve in N days")
+- Edit files with the editor tools (Edit / Write), not `sed -i`, redirects or heredocs, and run one command per call (no `&&`, `|`, `$(...)`, `cd ... &&`). Permission rules are matched against each part of a chain, so one unallowed part (`cd`, `head`, ...) or a shell edit stops the work at a confirmation prompt while the owner is away
 - PRs opened from the host with the owner's credentials cannot be approved by the owner; they merge only through the admin bypass
 - When you ask the owner to decide something, say why you did not decide it yourself (which condition: money, conflict with the philosophy, no judgment axis even after deriving one from intent, missing permission) and on what axis the owner should decide. If you cannot name the condition, decide yourself and proceed
 - Round trips with the owner are the bottleneck. Do not drip-feed requests ("do this" → "done" → "now this"). List every owner action and decision up front, say where you resume and what to send back, and if more round trips are unavoidable, say what each one is for and how many you expect. The consult skill is the exception: it digs out the owner's tacit knowledge through the back-and-forth itself
