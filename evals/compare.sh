@@ -75,6 +75,9 @@ run_arm() {
     --output-dir "$out/$label" --report "$out/$label.html" --json "$out/$label.json" \
     || status=$?
   [ "$status" -le 1 ] || { echo "eval failed for $label (exit $status)" >&2; exit "$status"; }
+  # A glob that matches nothing still exits 0 with an empty case list.
+  [ "$(jq '.cases | length' "$out/$label.json")" -gt 0 ] \
+    || { echo "no eval case matched '$case_glob' (cases are under evals/)" >&2; exit 2; }
 }
 
 run_arm before "$before"
