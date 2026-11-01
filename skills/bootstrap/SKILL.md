@@ -184,14 +184,16 @@ AI コンテキスト基盤が整ったら、技術インフラの構築に進�
 **やること**:
 1. 技術インフラの構築 (必要なものだけ):
    - **開発コマンドの入口** (必須)。philosophy/technology-choices「実行環境」に従い、言語のコマンドはすべてプロジェクトの開発イメージの中で走らせる。AGENTS.md の開発コマンド・git hook・Claude Code hook・CI はこの入口だけを通す (例: `./dev cargo test`)。制約:
-     - `podman` と `docker` のどちらでも動く (オーナーの端末は docker、ai-box の中は rootless Podman の単一 UID モード。ai-box の SKILL「プロジェクトのコマンドを動かす仕組み」)。開発イメージの中 (devcontainer 等) で呼ばれたら直接実行する
+     - `podman` と `docker` のどちらでも動く (rootless Podman の単一 UID モードを含む。オーナーが使う ai-box はこのモード: ai-box の SKILL「プロジェクトのコマンドを動かす仕組み」)。開発イメージの中 (devcontainer 等) で呼ばれたら直接実行する
+     - 入口それ自身は POSIX シェルで書き、ホストの git と docker / podman だけで動く (philosophy/technology-choices「開発イメージに入れるもの、clone したままで動かすもの」)
+   - **ai-box をプロジェクトの前提にしない**。ai-box はオーナーが AI 開発をするための個人の環境で、clone した人はその外で作業する。生成物 (AGENTS.md・README・hook・入口・コメント) は「ai-box の中で動く」前提で組み立てず、ai-box にあるもの (Node 等) を仕組みの根拠にしない。ai-box の中でも動くことは、rootless Podman で動くことで満たす
      - 作業ツリーをマウントして実行し、生成物の所有者が呼び出し元のユーザーのままになること
      - 開発イメージは CI でビルドしてレジストリから取得できるようにする (ai-box の中では `apt-get` のようにユーザーを切り替える Dockerfile をビルドできない)。依存のキャッシュはコンテナの外 (名前付きボリューム等) に置き、毎回の再取得を避ける
      - 言語ツールが見つからないときに、作業環境へのインストールや直接実行にフォールバックしない。入口の失敗として止める
    - devcontainer (開発環境のコンテナ化)。制約: エディタの devcontainer とローカル実行 (手動 `docker compose`) は **別の Compose プロジェクト** にする。同じプロジェクトに統合すると片方の `down` がもう片方を壊す (逃げ J)。ポートを publish するのは片方だけ。Docker outside of Docker は devcontainer の `features` で入れ、ソケットを手でマウントしない
    - docker-compose (ローカルインフラ)。上記の分離を保ったまま、devcontainer からローカル実行を起動できる構成にする
    - CI パイプライン (lint, test, format, type check, architecture tests)
-   - ローカルレビューゲート: git hook (pre-commit / pre-push) で決定的ゲートとレビュー記録の確認を行い、Claude Code の PreToolUse hook (`Bash` の `git commit` / `git push`) で同じ結果を AI に差し戻す。設計は `resources/local-review-gate.md`、指摘の扱いと完了判定は `resources/review-contract.md`。動作確認では review-contract.md「生成した仕組みが満たすべきケース」を通す。迂回経路 (`--no-verify` 等) は permissions の deny で塞ぐ
+   - ローカルレビューゲート: git hook (pre-commit / pre-push) で決定的ゲートとレビュー記録の確認を行い、Claude Code の PreToolUse hook (`Bash` の `git commit` / `git push`) で同じ結果を AI に差し戻す。設計は `resources/local-review-gate.md`、指摘の扱いと完了判定は `resources/review-contract.md`。動作確認では review-contract.md「生成した仕組みが満たすべきケース」を通す。迂回経路 (`--no-verify` 等) は permissions の deny で塞ぐ。hook それ自身は git と POSIX シェルで動かし、Claude Code hook はゲートの対象外のツール呼び出しを止めない (local-review-gate.md「hook それ自身は clone したままのホストで動かす」)
    - リモート受け入れ保証: 決定的ゲートの実行確認、レビュー台帳スナップショットの照合、基準ファイルの保護を、PR のコードを実行しない保護された検証経路で行う。設計は `resources/remote-acceptance.md`。レビュー契約と同じく生成先の 1 つの原典 (例: `docs/remote-acceptance.md`) に具体化し、AGENTS.md・レビュー契約・検証処理から参照させる。マージを止められるかどうか (保護ルールでマージを止める / PR に警告を出すだけ / まだ確かめていない) を、実際の資格情報と有効なルールで確かめて記録する。人間の承認なしでマージしてよい変更の条件は、AI が `resources/remote-acceptance.md` に沿って初案を起草し、典型的な変更・危険な変更・判断が分かれそうな変更の例でユーザーと任せる範囲を確かめる。合意して有効にするまでは承認なしのマージは行わず、条件の案を判断依頼として残して他の構築を進める (合意を bootstrap の完了の前提にしない)
    - linter/formatter/型チェッカーの設定
    - テストフレームワークの設定とサンプルテスト
@@ -214,6 +216,7 @@ AI コンテキスト基盤が整ったら、技術インフラの構築に進�
 3. **止まる**: 規約違反・型エラー・テスト失敗が検知されて止まる
 4. **再現する**: 別マシン・別開発者でも同じ結果になる
 5. **見える**: ログ・エラー・テストレポートが読める
+6. **触れる**: clone しただけのホスト (git と docker / podman だけ) で、devcontainer を起動せずに commit / push と開発コマンドの実行ができ、そのホストの Claude Code が調査用のコマンドとファイル編集を使える
 
 ## 生成した後の所有と、再実行
 

@@ -47,7 +47,10 @@
 - [ ] **止まる**: 規約違反・型エラー・テスト失敗が検知されて止まる
 - [ ] **再現する**: devcontainer 等で別環境でも同じ結果になる
 - [ ] **見える**: ログ・エラー・テストレポートが読める
-- [ ] 開発コマンドの入口があり、開発コマンド・git hook・CI が言語のコマンドを入口経由でだけ実行している。docker と podman (ai-box) の両方で動き、言語ツールのない作業環境から呼んでも成功する
+- [ ] **触れる**: clone しただけのホスト (git と docker / podman だけ) で、devcontainer を起動せずに commit / push と開発コマンドの実行ができ、そのホストの Claude Code が調査用のコマンドとファイル編集を使える
+- [ ] 開発コマンドの入口があり、開発コマンド・git hook・CI が言語のコマンドを入口経由でだけ実行している。docker と podman (rootless の単一 UID モードを含む) の両方で動き、言語ツールのない作業環境から呼んでも成功する
+- [ ] git hook・Claude Code hook・入口それ自身が git と POSIX シェルだけで動く (Node・Python・jq・プロジェクトの言語に頼らない)。Claude Code hook がゲートの対象外のツール呼び出しを止めない
+- [ ] 生成物が ai-box (オーナー個人の AI 用の環境) を前提にしていない
 - [ ] .claude/settings.json で言語のコマンドの直接実行が deny されている
 - [ ] AGENTS.md の「開発コマンド」が実際のコマンドで埋まっている (CLAUDE.md / GEMINI.md は `@AGENTS.md` で連動)
 - [ ] .claude/settings.json の allow が非破壊操作のみで構成されている (コンテナのライフサイクル操作・履歴破壊・環境削除は ask / deny)
