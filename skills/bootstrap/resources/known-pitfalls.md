@@ -29,6 +29,7 @@ bootstrap 中に AI と人間の双方が参照する「既知の CI/Infra 落�
   - 開発イメージは CI でビルドしてレジストリから取得する。ai-box の Podman は単一 UID のため、`apt-get` を含む Dockerfile を箱の中でビルドできない (`setgroups ... Operation not permitted`)
 - **検出方法**: AGENTS.md の開発コマンドや git hook に、入口を通らない言語のコマンドがある。ai-box の中で開発コマンドを実行して `command not found` になる
 - **参考**: foo-skills PR #86
+- **再発: タスクランナーだけ取り残される**: AGENTS.md・hook・CI を入口に通した後も、Makefile のターゲット (`cd backend && sqlx migrate run`、`pnpm run api:generate` 等) が言語のコマンドを直接叩いたまま残り、オーナーが指摘するまで直らないことが多い (triary の Makefile は別のコミットで直した)。原料が入口を通す場所を「AGENTS.md・git hook・CI」とだけ挙げていた。settings.json は `make db-migrate` を allow しており、`cargo:*` の deny はターゲットの中の `cargo` を捕まえないので、ここでも気づけない。生成後に Makefile・justfile・`package.json` の scripts・README・devcontainer の lifecycle コマンドを全件検索する
 
 ### hook をプロジェクトの言語や AI の作業環境のランタイムで書く (ホストで push も Claude も動かない)
 

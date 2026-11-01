@@ -53,6 +53,7 @@
 - [ ] 生成物が ai-box (オーナー個人の AI 用の環境) を前提にしていない
 - [ ] .claude/settings.json で言語のコマンドの直接実行が deny されている
 - [ ] AGENTS.md の「開発コマンド」が実際のコマンドで埋まっている (CLAUDE.md / GEMINI.md は `@AGENTS.md` で連動)
+- [ ] Makefile 等のタスクランナー・`package.json` の scripts・README の手順・devcontainer の lifecycle コマンドを全件検索し、言語のコマンドがすべて入口を通っている (deny はタスクランナーの中のコマンドを捕まえない)
 - [ ] .claude/settings.json の allow が非破壊操作のみで構成されている (コンテナのライフサイクル操作・履歴破壊・環境削除は ask / deny)
 - [ ] AGENTS.md が AI に日常的に実行させるコマンドが、すべて allow に当たることを確かめた (日常の作業で確認のダイアログが出ない)
 - [ ] known-pitfalls.md の該当エントリを確認し、該当する場合は回避策を適用した
