@@ -89,6 +89,6 @@ When receiving feedback about philosophy, perspectives or skill content:
 
 1. Turn the real failure into an eval case under `evals/` (see `evals/README.md`) and run it on the current sources (`claude plugin eval . --case <name>`). Only real incidents; never invent cases. If the failure cannot be reproduced as a case, say why in the PR. Inside ai-box the AI's shell cannot see Claude's credentials and child `claude` runs fail with `Not logged in`; the owner runs evals from `ai-box shell`
 2. Fix the target file
-3. Run the same case the same number of times and compare. Do not judge from a single run (LLM output varies)
+3. Run the same case the same number of times and compare (`evals/compare.sh -c <case> <branch>` runs both arms in temporary worktrees). Do not judge from a single run (LLM output varies)
 4. If the feedback is a general rule, update this CLAUDE.md
 5. Check if other files violate the same rule and fix them
