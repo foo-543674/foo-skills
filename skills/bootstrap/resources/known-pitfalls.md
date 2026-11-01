@@ -32,11 +32,12 @@ bootstrap 中に AI と人間の双方が参照する「既知の CI/Infra 落�
 
 ### hook をプロジェクトの言語や AI の作業環境のランタイムで書く (ホストで push も Claude も動かない)
 
-- **症状**: Node のないホストで clone すると `git commit` / `git push` が hook で失敗し、devcontainer を起動しないとリポジトリに触れない。同じホストの Claude Code は、Bash もファイル編集もすべて PreToolUse hook に止められ、動作確認の手伝いすらできない
+- **症状**: Node のないホストで clone すると `git commit` / `git push` が hook で失敗し、devcontainer を起動しないとリポジトリに触れない。同じホストの Claude Code は、Bash もファイル編集もすべて PreToolUse hook に止められ、動作確認の手伝いすらできない。docker があっても、`frontend/` に触れる commit はテキストの修正でも「frontend dependencies are missing; run '../dev pnpm install' ...」で止まる (ゲートが依存を自分で用意せず、準備不足で止めていた)
 - **原因**: レビューゲートの本体を TypeScript で書き、git hook が作業環境の Node で実行していた。根拠は「ai-box と devcontainer が既に Node を持つ」で、オーナー個人の AI 用の環境をプロジェクトの前提にしていた。Claude Code hook はすべての Bash と Edit / Write にマッチし、入力の解析に `node` を使い、解析できなければ止めていた。迂回の検出にはシェルの字句解析器を自作していた
 - **回避策**:
   - hook と入口それ自身は git と POSIX シェルで書く。言語のコマンドが要る決定的ゲートだけを入口経由で開発イメージに通す (philosophy/technology-choices「開発イメージに入れるもの、clone したままで動かすもの」)
   - Claude Code hook は対象外のツール呼び出しをすぐ通す。止めてよいのは `git commit` / `git push` だけ
+  - ゲートが要る依存はゲート自身か入口が用意する。準備不足で止めない
   - 迂回対策は deny と AGENTS.md の規約にとどめる。破れない層はリモートの受け入れ判定 (local-review-gate.md「迂回の禁止」)
 - **検出方法**: hook のスクリプトに `node` / `python` / `jq` 等の呼び出しがある。Node のないホストで clone して `git commit` を試す、または同じホストの Claude Code で `ls` を実行すると止まる
 - **参考**: triary (foo-skills の、この項目を追加した PR)
