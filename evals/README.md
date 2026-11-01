@@ -19,9 +19,12 @@ LLM の出力は毎回揺れるので、1 回の結果で判断しない。原�
 
 ### 直す前と後を比べる
 
+ai-box の中の AI のシェルからは eval が動かない (子の `claude` がログインできない)。ホストで別の端末を開き、次の 1 行を貼る。checkout も作業用ディレクトリも要らない:
+
 ```bash
-evals/compare.sh -c 'bootstrap-*' origin/feedback/foo   # PR のブランチを、main から分かれた時点の原料と比べる
-evals/compare.sh -c 'bootstrap-*'                      # 今の作業ツリー (未コミットの変更を含む) で比べる
+ai-box shell foo-543674/foo-skills -c 'git fetch -q origin && git show origin/main:evals/compare.sh | bash -s -- -c "bootstrap-*" origin/<PR のブランチ>'
 ```
 
-修正前は「main から分かれた時点の原料 + 対象の版の評価ケース」、修正後は「対象の版」で、同じ事例を同じ回数 (`-n`、既定 3) ずつ流す。作業用の worktree は終了時に消え、レポートは `evals/results/compare-<日時>/` (git の管理外) に `before.html` / `after.html` として残る。費用を抑えるため、プラグインなしの比較 (`--ablation`) は行わない。
+修正前は「main から分かれた時点の原料 + PR の評価ケース」、修正後は「PR のブランチ」で、同じ事例を同じ回数 (`-n`、既定 3) ずつ流し、最後にケースごとの通過率と、修正後に落ちた基準とその理由を端末に出す。作業用の worktree は終了時に消える。JSON・HTML レポート・要約 (`summary.txt`) は ai-box の中の clone の `evals/results/compare-<日時>/` (git の管理外) に残り、同じ clone を使う AI のセッションからも読める。レポートは公開しない (`--no-publish`)。費用を抑えるため、プラグインなしの比較 (`--ablation`) は行わない。
+
+ai-box の中で直接実行するなら `evals/compare.sh -c 'bootstrap-*' origin/<PR のブランチ>`。ブランチを省くと今の作業ツリー (未コミットの変更を含む) を修正後として比べる。
