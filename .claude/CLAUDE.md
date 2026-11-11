@@ -87,7 +87,7 @@ foo-skills/
 
 When receiving feedback about philosophy, perspectives or skill content:
 
-1. Turn the real failure into an eval case under `evals/` (see `evals/README.md`) and run it on the current sources (`claude plugin eval . --case <name>`). Only real incidents; never invent cases. If the failure cannot be reproduced as a case, say why in the PR. Inside ai-box the AI's shell cannot see Claude's credentials and child `claude` runs fail with `Not logged in`; the owner runs evals from `ai-box shell`
+1. Turn the real failure into an eval case under `evals/` (see `evals/README.md`) and run it on the current sources (`claude plugin eval . --case <name>`). Only real incidents; never invent cases. The owner's description of the incident is enough as the source: do not ask for the repository, logs or outputs where it happened (they are often in work repositories that cannot be shared), and do not wait on them. Rebuild the situation in a generic prompt from the description and write in `source.md` that it was rebuilt from it. If the failure cannot be reproduced as a case, say why in the PR. Inside ai-box the AI's shell cannot see Claude's credentials and child `claude` runs fail with `Not logged in`; the owner runs evals from `ai-box shell`
 2. Fix the target file
 3. Run the same case the same number of times and compare (`evals/compare.sh -c <case> <branch>` runs both arms in temporary worktrees). Do not judge from a single run (LLM output varies)
 4. If the feedback is a general rule, update this CLAUDE.md
