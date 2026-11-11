@@ -40,7 +40,7 @@ philosophy/technology-choices「開発イメージに入れるもの、clone し
 
 ## レビュー記録
 
-- レビューは生成先のレビュースキル (`.agents/skills/code-review/SKILL.md`、Phase 3 で生成) に従って、実装とは別のコンテキストで行う (Claude Code なら `.claude/agents/code-reviewer.md`、Codex なら別セッション)。`review-contract.md` の **指摘の台帳** に記録する。各レビュー回には対象 diff のハッシュと実行時刻を付ける。台帳はリポジトリ外 (例: `.git/` 配下) に置き、追跡対象にしない
+- レビューは生成先のレビュースキル (`.agents/skills/code-review/SKILL.md`、Phase 3 で生成) に従って、実装とは別のコンテキストで行う (Claude Code なら `.claude/agents/code-reviewer.md`、Codex なら別セッション)。`review-contract.md` の **指摘の台帳** に記録する。各レビュー回には対象 diff の識別値と実行時刻を付ける。識別値はリモート受け入れの照合と同じ方法で計算し、base が進んだだけで PR 自身の差分が同じなら同じ値になるものにする (`remote-acceptance.md`「証跡の対応付け」)。台帳はリポジトリ外 (例: `.git/` 配下) に置き、追跡対象にしない
 - hook は「現在の diff をレビューした回が台帳にあり、`review-contract.md`「完了の判定」を満たすか」を見る。ただし判断依頼を積んだエスカレーション中の指摘では止めない (`review-contract.md`「作業の継続と受け入れ」)。人間の判断待ちで作業を止めず、受け入れの判定 (リモート受け入れ・マージ) で止める。件数ではなく指摘ごとの状態で判定する。**記録が無い = レビューしていない = 止める**。「指摘なし」と「レビュー未実施」を外形で区別できる形にする
 - diff が変わればレビューし直す (修正後に再レビューせず commit する経路を塞ぐ)。台帳は diff をまたいで引き継ぎ、再レビューは既存の指摘の解消確認から始める
 - 重大度ごとの通過条件は `review-contract.md`「完了の判定」に従う。ここには転記しない。台帳は追跡されないため、Important を却下・保留したときはコミットメッセージ本文にも理由を残す
