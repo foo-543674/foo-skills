@@ -32,11 +32,11 @@
 | `quality-standards.md` | 製品品質 vs 技術品質、三層防御 |
 | `development-values.md` | バーチカルスライス、テストファースト、0→0.1 / 99.9→100 |
 
-### perspectives/ — 品質レンズ (20 観点)
+### perspectives/ — 品質レンズ (21 観点)
 
 設計時にもレビュー時にも使える二重用途の品質基準。各ファイルに「判断基準」「アンチパターン」「品質チェックポイント」を含む。
 
-architecture, api-design, data-modeling, component, disposability, testing, error-handling, security, performance, concurrency, naming, readability, comments, variables, solid, functional, type-design, state-design, dependency, documentation
+architecture, api-design, data-modeling, component, disposability, testing, error-handling, security, performance, concurrency, naming, readability, comments, variables, solid, functional, type-design, state-design, dependency, documentation, debugging
 
 ### skills/bootstrap — AI 自走基盤の生成器
 

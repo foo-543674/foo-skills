@@ -28,10 +28,10 @@ foo-skills/
 │   ├── technology-choices.md      #   静的型付け優先、関数型寄り、技術選定基準
 │   ├── quality-standards.md       #   製品品質 vs 技術品質、三層防御
 │   └── development-values.md      #   バーチカルスライス、テストファースト、0→0.1 / 99.9→100
-├── perspectives/                  # 原料: 品質レンズ (20 ファイル)
+├── perspectives/                  # 原料: 品質レンズ (21 ファイル)
 │   ├── architecture.md            #   営みの起源、レイヤー定義、依存方向
 │   ├── api-design.md              #   契約の明確性、HTTP ステータスセマンティクス
-│   └── ...                        #   (他 18 観点)
+│   └── ...                        #   (他 19 観点)
 └── skills/
     └── bootstrap/                 # エンジン: プロジェクトに AI コンテキストを生成
         ├── SKILL.md

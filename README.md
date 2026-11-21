@@ -53,7 +53,7 @@ foo-skills/
 │   ├── quality-standards  製品品質 vs 技術品質、三層防御
 │   └── development-values バーチカルスライス、テストファースト
 │
-├── perspectives/        品質レンズ (20 files)
+├── perspectives/        品質レンズ (21 files)
 │   ├── architecture       営みの起源、レイヤー定義、依存方向
 │   ├── api-design         契約の明確性、ステータスセマンティクス
 │   ├── data-modeling      ストレージ非依存、正規化判断
@@ -73,7 +73,8 @@ foo-skills/
 │   ├── type-design        Discriminated Union、Branded Type
 │   ├── state-design       Boolean Explosion 防止
 │   ├── dependency         依存追加の意識的判断
-│   └── documentation      設計判断の記録
+│   ├── documentation      設計判断の記録
+│   └── debugging          時系列優先、事実と推測の区別
 │
 └── skills/bootstrap/    AI 自走基盤の生成器
 ```

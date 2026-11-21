@@ -28,10 +28,10 @@ foo-skills/
 │   ├── quality-standards.md       #   Product vs technical quality, three-layer defense
 │   └── development-values.md      #   Vertical slicing, test-first, 0→0.1 / 99.9→100
 ├── evals/                         # Eval cases built from real failures (claude plugin eval)
-├── perspectives/                  # Source material: quality lenses (20 files)
+├── perspectives/                  # Source material: quality lenses (21 files)
 │   ├── architecture.md            #   Layering by origin of operations, dependency direction
 │   ├── api-design.md              #   Contract clarity, HTTP status semantics
-│   └── ...                        #   (18 more perspectives)
+│   └── ...                        #   (19 more perspectives)
 └── skills/
     ├── bootstrap/                 # Engine: generates AI context into projects
     │   ├── SKILL.md
