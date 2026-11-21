@@ -37,10 +37,7 @@ foo-skills/
     │   ├── SKILL.md
     │   └── resources/             #   context-template, checklist, review/acceptance contracts, ...
     ├── consult/                   # Thinking partner from vague ideas to concrete design
-    ├── skill-feedback/            # Files owner feedback as Issues on this repo
-    └── ai-box/                    # Per-machine container that reaches GitHub only as a GitHub App
-        ├── SKILL.md
-        └── resources/box/         #   Verified implementation, shipped as-is
+    └── skill-feedback/            # Files owner feedback as Issues on this repo
 ```
 
 ## Editing Rules
@@ -65,13 +62,6 @@ foo-skills/
 - References philosophy/ and perspectives/ as source material
 - Does NOT contain How for technical infrastructure (AI derives that from its own knowledge)
 
-### skills/ai-box/
-
-- Exception to "no How": ships a verified implementation (`resources/box/`) as-is, because mistakes that break the credential boundary (agent forwarding, writable config mounts) are silent and the box does not vary by tech stack
-- Keep the invariants in SKILL.md. Before changing `resources/box/`, run `ai-box check` and `resources/setup.md` steps 6-8 on a real machine
-- Never put secrets or owner-specific values in resources
-- Never add language toolchains to the box image. Project commands run in the project's dev image through rootless Podman (single-UID mode, `seccomp.json`). Do not "fix" Podman with `privileged`, `SYS_ADMIN` or `seccomp=unconfined`
-
 ## Working on this repository
 
 - Develop from ai-box (`ai-box claude foo-543674/foo-skills`) so that PRs are opened by the GitHub App, not the owner. The ruleset requires the owner's approval; auto-merge is enabled, so an approved PR merges without further interaction
@@ -87,7 +77,7 @@ foo-skills/
 
 When receiving feedback about philosophy, perspectives or skill content:
 
-1. Turn the real failure into an eval case under `evals/` (see `evals/README.md`) and run it on the current sources (`claude plugin eval . --case <name>`). Only real incidents; never invent cases. The owner's description of the incident is enough as the source: do not ask for the repository, logs or outputs where it happened (they are often in work repositories that cannot be shared), and do not wait on them. Rebuild the situation in a generic prompt from the description and write in `source.md` that it was rebuilt from it. If the failure cannot be reproduced as a case, say why in the PR. Inside ai-box the AI's shell cannot see Claude's credentials and child `claude` runs fail with `Not logged in`; the owner runs evals from `ai-box shell`
+1. Turn the real failure into an eval case under `evals/` (see `evals/README.md`) and run it on the current sources (`claude plugin eval . --case <name>`). Only real incidents; never invent cases. The owner's description of the incident is enough as the source: do not ask for the repository, logs or outputs where it happened (they are often in work repositories that cannot be shared), and do not wait on them. Rebuild the situation in a generic prompt from the description and write in `source.md` that it was rebuilt from it. If the failure cannot be reproduced as a case, say why in the PR
 2. Fix the target file
 3. Run the same case the same number of times and compare (`evals/compare.sh -c <case> <branch>` runs both arms in temporary worktrees). Do not judge from a single run (LLM output varies)
 4. If the feedback is a general rule, update this CLAUDE.md
