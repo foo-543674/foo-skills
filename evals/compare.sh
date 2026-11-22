@@ -6,9 +6,6 @@
 #   <ref>  the change to evaluate (a branch, e.g. origin/feedback/foo).
 #          Omitted: the current working tree, uncommitted edits included.
 #
-# From the host, in one line (no checkout needed; the script is read from main):
-#   ai-box shell foo-543674/foo-skills -c 'git fetch -q origin && git show origin/main:evals/compare.sh | bash -s -- -c "bootstrap-*" origin/<branch>'
-#
 # "Before" is the sources at the merge base of <ref> and origin/main, graded
 # with the eval cases of <ref>, so both arms are judged by the same cases.
 # Prints a per-case before / after table and the failed criteria of the

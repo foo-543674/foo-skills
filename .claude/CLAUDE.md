@@ -37,10 +37,7 @@ foo-skills/
     │   ├── SKILL.md
     │   └── resources/             #   context-template, checklist, review/acceptance contracts, ...
     ├── consult/                   # Thinking partner from vague ideas to concrete design
-    ├── skill-feedback/            # Files owner feedback as Issues on this repo
-    └── ai-box/                    # Per-machine container that reaches GitHub only as a GitHub App
-        ├── SKILL.md
-        └── resources/box/         #   Verified implementation, shipped as-is
+    └── skill-feedback/            # Files owner feedback as Issues on this repo
 ```
 
 ## Editing Rules
@@ -65,21 +62,13 @@ foo-skills/
 - References philosophy/ and perspectives/ as source material
 - Does NOT contain How for technical infrastructure (AI derives that from its own knowledge)
 
-### skills/ai-box/
-
-- Exception to "no How": ships a verified implementation (`resources/box/`) as-is, because mistakes that break the credential boundary (agent forwarding, writable config mounts) are silent and the box does not vary by tech stack
-- Keep the invariants in SKILL.md. Before changing `resources/box/`, run `ai-box check` and `resources/setup.md` steps 6-8 on a real machine
-- Never put secrets or owner-specific values in resources
-- Never add language toolchains to the box image. Project commands run in the project's dev image through rootless Podman (single-UID mode, `seccomp.json`). Do not "fix" Podman with `privileged`, `SYS_ADMIN` or `seccomp=unconfined`
-
 ## Working on this repository
 
-- Develop from ai-box (`ai-box claude foo-543674/foo-skills`) so that PRs are opened by the GitHub App, not the owner. The ruleset requires the owner's approval; auto-merge is enabled, so an approved PR merges without further interaction
+- Work with the owner's everyday credential, shared with the AI: a fine-grained personal access token without Administration and without Deployments: write (philosophy/quality-standards「端末の認証」). The PR author and any approver would be the same account, so the merge gate is CI checks, not the owner's approval. The ruleset requires a PR with zero approvals for `main` and forbids force pushes and deletion of the default branch; this token cannot change it. Merge your own PRs once their checks pass, unless they carry an owner decision that is still open. Ask for the owner's approval only for operations that fall under losses ③-⑤ (spending money, deleting without a backup, publishing in the owner's name)
 - Do not stop to ask "may I merge?" after each PR. List waiting PRs at a break
 - Do not build in dependencies the changes do not need. Branch work whose content is independent from `main`, not from whatever branch you were on. Stack on an unmerged PR only when the content depends on it and the dependency cannot be cut; then open the PR anyway (do not keep work only locally), base it on the branch below so it shows only its own diff, and say what it depends on and what to look at. Enable auto-merge only on PRs whose base is `main`; after the PR below merges, retarget the next one to `main` yourself. Merge order is yours to track, not the owner's
 - Ask the owner to approve only PRs that can be judged now: all checks on the current HEAD green, and the part that needs the owner's eyes named. Do not hand over conditional requests ("approve after #xx merges", "approve in N days"). Work that waits on such a condition is still opened, as a draft PR that says what it waits for, so the owner can notice whether it is needed at all; mark it ready yourself when the condition is met
 - Edit files with the editor tools (Edit / Write), not `sed -i`, redirects or heredocs, and run one command per call (no `&&`, `|`, `$(...)`, `cd ... &&`). Permission rules are matched against each part of a chain, so one unallowed part (`cd`, `head`, ...) or a shell edit stops the work at a confirmation prompt while the owner is away
-- PRs opened from the host with the owner's credentials cannot be approved by the owner; they merge only through the admin bypass
 - When you ask the owner to decide something, say why you did not decide it yourself (which condition: money, conflict with the philosophy, no judgment axis even after deriving one from intent, missing permission) and on what axis the owner should decide. If you cannot name the condition, decide yourself and proceed
 - Round trips with the owner are the bottleneck. Do not drip-feed requests ("do this" → "done" → "now this"). List every owner action and decision up front, say where you resume and what to send back, and if more round trips are unavoidable, say what each one is for and how many you expect. The consult skill is the exception: it digs out the owner's tacit knowledge through the back-and-forth itself
 
@@ -87,7 +76,7 @@ foo-skills/
 
 When receiving feedback about philosophy, perspectives or skill content:
 
-1. Turn the real failure into an eval case under `evals/` (see `evals/README.md`) and run it on the current sources (`claude plugin eval . --case <name>`). Only real incidents; never invent cases. The owner's description of the incident is enough as the source: do not ask for the repository, logs or outputs where it happened (they are often in work repositories that cannot be shared), and do not wait on them. Rebuild the situation in a generic prompt from the description and write in `source.md` that it was rebuilt from it. If the failure cannot be reproduced as a case, say why in the PR. Inside ai-box the AI's shell cannot see Claude's credentials and child `claude` runs fail with `Not logged in`; the owner runs evals from `ai-box shell`
+1. Turn the real failure into an eval case under `evals/` (see `evals/README.md`) and run it on the current sources (`claude plugin eval . --case <name>`). Only real incidents; never invent cases. The owner's description of the incident is enough as the source: do not ask for the repository, logs or outputs where it happened (they are often in work repositories that cannot be shared), and do not wait on them. Rebuild the situation in a generic prompt from the description and write in `source.md` that it was rebuilt from it. If the failure cannot be reproduced as a case, say why in the PR
 2. Fix the target file
 3. Run the same case the same number of times and compare (`evals/compare.sh -c <case> <branch>` runs both arms in temporary worktrees). Do not judge from a single run (LLM output varies)
 4. If the feedback is a general rule, update this CLAUDE.md
